@@ -6,11 +6,12 @@
   <title>AGB – Office AI</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:-apple-system,'Helvetica Neue',Arial,sans-serif; background:#0C0C0C; color:#E8E8E8; }
+    html { min-height:100vh; }
+    body { font-family:-apple-system,'Helvetica Neue',Arial,sans-serif; background:#0C0C0C; color:#E8E8E8; min-height:100vh; display:flex; flex-direction:column; }
     nav { display:flex; justify-content:space-between; align-items:center; padding:24px 48px; border-bottom:1px solid #1E1E1E; }
     .nav-logo { font-size:12px; font-weight:700; letter-spacing:5px; color:#fff; text-decoration:none; }
     .nav-back { font-size:13px; color:#505050; text-decoration:none; }
-    .container { max-width:760px; margin:0 auto; padding:80px 48px; }
+    .container { max-width:760px; margin:0 auto; padding:80px 48px; flex:1; }
     .label { font-size:10px; color:#3D3D3D; letter-spacing:3px; font-weight:600; text-transform:uppercase; margin-bottom:16px; }
     h1 { font-size:40px; font-weight:700; letter-spacing:-1px; color:#fff; margin-bottom:12px; }
     .date { font-size:13px; color:#3A3A3A; margin-bottom:60px; }
@@ -22,7 +23,7 @@
     a { color:#E8E8E8; }
     .highlight { background:#111; border:1px solid #1E1E1E; border-radius:12px; padding:20px 24px; margin:24px 0; }
     .highlight p { margin:0; }
-    footer { border-top:1px solid #1E1E1E; padding:32px 48px; text-align:center; }
+    footer { border-top:1px solid #1E1E1E; padding:32px 48px; text-align:center; margin-top:auto; }
     footer a { font-size:12px; color:#2A2A2A; margin:0 12px; }
     @media(max-width:768px) { nav { padding:20px 24px; } .container { padding:60px 24px; } h1 { font-size:28px; } footer { padding:24px; } }
   </style>
@@ -40,11 +41,12 @@
   <p class="date">Stand: Januar 2025 · Office AI, Livia Vogel, Kanton Luzern, Schweiz</p>
 
   <h2>1. Geltungsbereich</h2>
-  <p>Diese Allgemeinen Geschäftsbedingungen (AGB) regeln die Nutzung der Office AI App und der dazugehörigen Dienste (nachfolgend «Dienst») zwischen der Anbieterin Livia Vogel, Office AI, Kanton Luzern, Schweiz (nachfolgend «Anbieterin») und dem Kunden (nachfolgend «Kunde»).</p>
-  <p>Mit der Registrierung und Nutzung des Dienstes akzeptiert der Kunde diese AGB. Es gelten ausschliesslich diese AGB — abweichende Bedingungen des Kunden werden nicht anerkannt.</p>
+  <p>Für die Nutzung der Office AI App sowie alle Geschäftsbeziehungen zwischen Livia Vogel, Office AI (nachfolgend «Office AI») und ihren Kunden gelten die nachfolgenden Allgemeinen Geschäftsbedingungen in der zum Zeitpunkt der Nutzung aktuell gültigen Fassung.</p>
+  <p>Als Kunde gilt jede natürliche oder juristische Person, die Office AI für geschäftliche Zwecke nutzt. Mit der Registrierung und Nutzung des Dienstes bestätigt der Kunde, diese AGB gelesen zu haben und ihnen zuzustimmen. Abweichende Bedingungen des Kunden werden nur anerkannt, wenn Office AI dies ausdrücklich schriftlich bestätigt.</p>
+  <p>Sollten einzelne Bestimmungen dieser AGB unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen davon unberührt.</p>
 
-  <h2>2. Beschreibung des Dienstes</h2>
-  <p>Office AI ist eine KI-gestützte Software-as-a-Service Lösung für Unternehmen jeder Grösse und Branche. Der Dienst umfasst je nach Abonnement:</p>
+  <h2>2. Leistungsbeschreibung</h2>
+  <p>Office AI ist eine KI-gestützte Software-as-a-Service Lösung für Unternehmen jeder Grösse und Branche. Der Dienst umfasst je nach gewähltem Abonnement folgende Funktionen:</p>
   <ul>
     <li>Erstellung von Geschäftsdokumenten (Offerten, Rechnungen, Mahnungen)</li>
     <li>KI-gestützter E-Mail-Assistent</li>
@@ -55,74 +57,77 @@
     <li>Konkurrenz-Analyse</li>
     <li>Team-Verwaltung</li>
   </ul>
+  <p>Alle Angaben zu Funktionen und Verfügbarkeit sind ohne Gewähr und können sich jederzeit ändern. Office AI behält sich vor, den Funktionsumfang weiterzuentwickeln oder anzupassen.</p>
 
   <h2>3. Vertragsabschluss und Registrierung</h2>
-  <p>Der Vertrag kommt mit der erfolgreichen Registrierung und Auswahl eines Abonnements zustande. Der Kunde bestätigt, mindestens 18 Jahre alt zu sein und geschäftsfähig zu sein. Jede Person darf nur ein Konto erstellen.</p>
+  <p>Der Vertrag kommt mit der erfolgreichen Registrierung und Auswahl eines Abonnements zustande. Der Kunde bestätigt bei der Registrierung, mindestens 18 Jahre alt und geschäftsfähig zu sein. Pro Unternehmen ist grundsätzlich ein Konto vorgesehen; mehrere Nutzer können über die Team-Funktion hinzugefügt werden.</p>
 
-  <h2>4. Abonnements und Preise</h2>
+  <h2>4. Abonnements, Preise und Zahlungsbedingungen</h2>
 
   <h3>4.1 Abonnementpläne</h3>
   <ul>
-    <li><strong>Starter:</strong> CHF 79 / Monat</li>
-    <li><strong>Business:</strong> CHF 199 / Monat</li>
-    <li><strong>Pro:</strong> CHF 349 / Monat</li>
-    <li><strong>Enterprise:</strong> CHF 29 / User / Monat (nur auf Anfrage, Mindestlaufzeit 12 Monate)</li>
+    <li><strong>Starter:</strong> CHF 79 / Monat — 3 User inklusive, max. 5 User</li>
+    <li><strong>Business:</strong> CHF 199 / Monat — 10 User inklusive, max. 20 User</li>
+    <li><strong>Pro:</strong> CHF 349 / Monat — 50 User inklusive, unbegrenzt erweiterbar</li>
+    <li><strong>Zusätzliche User:</strong> CHF 29 / User / Monat (zu jedem Plan buchbar)</li>
   </ul>
 
   <h3>4.2 Zahlungsbedingungen</h3>
-  <p>Die Abonnementgebühren werden monatlich im Voraus fällig und über Stripe abgerechnet. Bei fehlgeschlagenem Zahlungsversuch wird der Zugang zum Dienst nach 7 Tagen eingeschränkt. Alle Preise verstehen sich exkl. MwSt (falls anwendbar).</p>
+  <p>Die Abonnementgebühren werden monatlich im Voraus fällig und über den Zahlungsanbieter Stripe abgerechnet. Dem Kunden stehen die im Bestellprozess angegebenen Zahlungsmöglichkeiten zur Verfügung. Bei fehlgeschlagenem Zahlungsversuch wird der Zugang zum Dienst nach 7 Tagen eingeschränkt. Alle Preise verstehen sich exklusive Mehrwertsteuer, sofern diese anfällt.</p>
 
   <h3>4.3 Preisänderungen</h3>
-  <p>Preisänderungen werden dem Kunden mindestens 30 Tage im Voraus per E-Mail mitgeteilt. Bei Nichtakzeptanz kann der Kunde das Abonnement vor Inkrafttreten der Änderung kündigen.</p>
+  <p>Office AI behält sich vor, die Preise anzupassen. Preiserhöhungen werden dem Kunden mindestens 30 Tage im Voraus per E-Mail mitgeteilt. Stimmt der Kunde der Änderung nicht zu, kann er das Abonnement vor Inkrafttreten der Änderung kündigen.</p>
 
   <h2>5. Kündigung</h2>
-  <p>Sie können Ihr Abonnement jederzeit direkt in der App kündigen. Gehen Sie zu Einstellungen und tippen Sie auf «Abo anpassen». Die Kündigung wird zum Ende der laufenden Abrechnungsperiode wirksam. Bis dahin bleibt der volle Zugang zu allen gebuchten Features erhalten. Eine Rückerstattung bereits bezahlter Gebühren erfolgt nicht, ausser bei einem wesentlichen Fehler des Dienstes.</p>
+  <p>Der Kunde kann sein Abonnement jederzeit direkt in der App kündigen. Dazu geht er unter Einstellungen auf «Abo anpassen». Die Kündigung wird zum Ende der laufenden Abrechnungsperiode wirksam. Bis dahin bleibt der volle Zugang zu allen gebuchten Funktionen erhalten. Eine Rückerstattung bereits bezahlter Gebühren erfolgt nicht, ausser bei einem wesentlichen Fehler des Dienstes.</p>
 
   <h2>6. Nutzungsrechte und Einschränkungen</h2>
 
-  <h3>6.1 Gewährtes Nutzungsrecht</h3>
-  <p>Die Anbieterin gewährt dem Kunden ein nicht-exklusives, nicht übertragbares Recht zur Nutzung des Dienstes für eigene geschäftliche Zwecke.</p>
+  <h3>6.1 Nutzungsrecht</h3>
+  <p>Office AI gewährt dem Kunden ein nicht-exklusives, nicht übertragbares Recht zur Nutzung des Dienstes für eigene geschäftliche Zwecke während der Laufzeit des Abonnements.</p>
 
-  <h3>6.2 Verbotene Nutzungen</h3>
-  <p>Der Kunde verpflichtet sich, den Dienst nicht zu nutzen für:</p>
+  <h3>6.2 Unzulässige Nutzungen</h3>
+  <p>Der Kunde verpflichtet sich, den Dienst nicht für folgende Zwecke zu nutzen:</p>
   <ul>
     <li>Illegale oder betrügerische Aktivitäten</li>
     <li>Erstellung von Spam oder unerwünschten Massenmitteilungen</li>
     <li>Verletzung von Rechten Dritter</li>
     <li>Reverse Engineering der Software</li>
     <li>Umgehung von Sicherheitsmassnahmen</li>
-    <li>Weiterverkauf des Dienstes ohne Genehmigung</li>
+    <li>Weiterverkauf des Dienstes ohne ausdrückliche Genehmigung</li>
   </ul>
 
   <h2>7. KI-Inhalte und Haftungsausschluss</h2>
-  <p>Office AI nutzt künstliche Intelligenz zur Erstellung von Inhalten. Der Kunde ist allein verantwortlich für die Überprüfung, Bearbeitung und Verwendung der KI-generierten Inhalte. Die Anbieterin übernimmt keine Haftung für die Richtigkeit, Vollständigkeit oder Eignung der generierten Inhalte für einen bestimmten Zweck.</p>
-  <p>Insbesondere übernimmt die Anbieterin keine Haftung für:</p>
+  <p>Office AI verwendet künstliche Intelligenz zur Erstellung von Inhalten. Der Kunde ist allein verantwortlich für die Prüfung, Bearbeitung und Verwendung der generierten Inhalte. Office AI übernimmt keine Haftung für die Richtigkeit, Vollständigkeit oder Eignung der generierten Inhalte für einen bestimmten Zweck.</p>
+  <p>Office AI haftet insbesondere nicht für:</p>
   <ul>
-    <li>Fehler in generierten Dokumenten oder E-Mails</li>
+    <li>Fehler in generierten Dokumenten, E-Mails oder Analysen</li>
     <li>Steuerliche oder rechtliche Konsequenzen aus generierten Inhalten</li>
-    <li>Entscheidungen des Kunden basierend auf KI-Analysen</li>
+    <li>Geschäftsentscheidungen des Kunden basierend auf KI-Ausgaben</li>
   </ul>
 
-  <h2>8. Verfügbarkeit des Dienstes</h2>
-  <p>Die Anbieterin strebt eine Verfügbarkeit von 99% an, kann diese jedoch nicht garantieren. Geplante Wartungsarbeiten werden wenn möglich im Voraus angekündigt. Bei längeren Ausfällen (über 24 Stunden) wird der betroffene Zeitraum nicht berechnet.</p>
+  <h2>8. Verfügbarkeit</h2>
+  <p>Office AI strebt eine Verfügbarkeit von 99% an, kann diese jedoch nicht garantieren. Geplante Wartungsarbeiten werden wenn möglich im Voraus angekündigt. Bei Ausfällen von mehr als 24 Stunden wird der betroffene Zeitraum nicht in Rechnung gestellt.</p>
 
   <h2>9. Datenschutz</h2>
-  <p>Die Bearbeitung von Personendaten erfolgt gemäss unserer Datenschutzerklärung, die Bestandteil dieser AGB ist: <a href="datenschutz.html">officeai.ch/datenschutz</a></p>
+  <p>Die Bearbeitung von Personendaten erfolgt gemäss unserer Datenschutzerklärung, die Bestandteil dieser AGB ist und unter <a href="datenschutz.html">officeai.com/datenschutz</a> abrufbar ist.</p>
 
   <h2>10. Geistiges Eigentum</h2>
-  <p>Alle Rechte an der Office AI App, dem Code, dem Design und den Marken verbleiben bei der Anbieterin. Der Kunde behält alle Rechte an den von ihm eingegebenen Daten und den daraus generierten Inhalten.</p>
+  <p>Alle Rechte an der Office AI App, dem Code, dem Design und den Marken verbleiben bei Office AI. Der Kunde behält alle Rechte an den von ihm eingegebenen Daten und den daraus generierten Inhalten.</p>
 
   <h2>11. Haftungsbeschränkung</h2>
-  <p>Die Haftung der Anbieterin ist auf die vom Kunden in den letzten 3 Monaten bezahlten Abonnementgebühren beschränkt. Die Anbieterin haftet nicht für indirekte Schäden, entgangenen Gewinn oder Datenverlust.</p>
+  <p>Die Haftung von Office AI ist auf die vom Kunden in den letzten 3 Monaten bezahlten Abonnementgebühren beschränkt. Office AI haftet nicht für indirekte Schäden, entgangenen Gewinn oder Datenverlust. Vorbehalten bleibt eine weitergehende zwingende gesetzliche Haftung, beispielsweise für grobe Fahrlässigkeit.</p>
 
-  <h2>12. Anwendbares Recht und Gerichtsstand</h2>
-  <p>Es gilt Schweizer Recht, unter Ausschluss der Kollisionsnormen. Gerichtsstand ist Luzern, Schweiz.</p>
+  <h2>12. Änderungen dieser AGB</h2>
+  <p>Office AI behält sich vor, diese AGB jederzeit anzupassen. Wesentliche Änderungen werden dem Kunden 30 Tage im Voraus per E-Mail mitgeteilt. Die weitere Nutzung des Dienstes nach Inkrafttreten der Änderungen gilt als Zustimmung.</p>
 
-  <h2>13. Änderungen der AGB</h2>
-  <p>Die Anbieterin kann diese AGB jederzeit anpassen. Wesentliche Änderungen werden dem Kunden 30 Tage im Voraus per E-Mail mitgeteilt. Die weitere Nutzung des Dienstes nach Inkrafttreten gilt als Akzeptanz.</p>
+  <h2>13. Anwendbares Recht und Gerichtsstand</h2>
+  <p>Es gilt ausschliesslich materielles Schweizer Recht unter Ausschluss kollisionsrechtlicher Normen. Das UN-Kaufrecht (CISG) wird ausdrücklich ausgeschlossen. Gerichtsstand ist Luzern, soweit das Gesetz keine zwingenden Gerichtsstände vorsieht.</p>
 
   <h2>14. Kontakt</h2>
   <p>Bei Fragen zu diesen AGB: <a href="mailto:info@aioffice.com">info@aioffice.com</a></p>
+
+  <p class="date" style="margin-top:48px; margin-bottom:0;">(Version Januar 2025)</p>
 </div>
 
 <footer>
