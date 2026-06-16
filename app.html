@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Office AI – App</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,'Helvetica Neue',Arial,sans-serif; background:#0C0C0C; color:#E8E8E8; min-height:100vh; }
+
+    /* SIDEBAR */
+    .sidebar { position:fixed; left:0; top:0; width:240px; height:100vh; background:#0C0C0C; border-right:1px solid #1E1E1E; display:flex; flex-direction:column; padding:32px 0; z-index:100; }
+    .sidebar-logo { font-size:11px; font-weight:700; letter-spacing:5px; color:#fff; padding:0 24px; margin-bottom:40px; }
+    .nav-section { font-size:9px; color:#2A2A2A; letter-spacing:2px; font-weight:600; text-transform:uppercase; padding:0 24px; margin:20px 0 8px; }
+    .nav-item { display:flex; align-items:center; gap:12px; padding:10px 24px; cursor:pointer; border-left:2px solid transparent; transition:all 0.15s; }
+    .nav-item:hover { background:#111; }
+    .nav-item.active { border-left-color:#E8E8E8; background:#111; }
+    .nav-item.active .nav-label { color:#E8E8E8; }
+    .nav-item.locked { opacity:0.25; cursor:not-allowed; }
+    .nav-icon { font-size:15px; width:20px; text-align:center; }
+    .nav-label { font-size:13px; color:#505050; font-weight:500; }
+    .nav-item.active .nav-label { color:#E8E8E8; }
+    .sidebar-bottom { margin-top:auto; padding:0 24px; }
+    .plan-badge { display:inline-block; border:1px solid #2A2A2A; border-radius:6px; padding:4px 10px; font-size:9px; font-weight:700; color:#3A3A3A; letter-spacing:2px; margin-bottom:12px; }
+    .user-info { font-size:12px; color:#2A2A2A; margin-bottom:16px; line-height:1.6; }
+    .logout-btn { font-size:12px; color:#2A2A2A; cursor:pointer; background:none; border:none; padding:0; }
+    .logout-btn:hover { color:#505050; }
+
+    /* MAIN */
+    .main { margin-left:240px; padding:48px; min-height:100vh; }
+    .page { display:none; }
+    .page.active { display:block; }
+    .page-label { font-size:10px; color:#3D3D3D; letter-spacing:3px; font-weight:600; text-transform:uppercase; margin-bottom:12px; }
+    .page-title { font-size:36px; font-weight:700; letter-spacing:-1px; color:#fff; margin-bottom:8px; }
+    .page-subtitle { font-size:14px; color:#3A3A3A; margin-bottom:40px; line-height:1.6; }
+
+    /* CARDS */
+    .card { background:#111; border:1px solid #1E1E1E; border-radius:16px; padding:28px; margin-bottom:16px; }
+    .card-title { font-size:14px; font-weight:700; color:#E8E8E8; margin-bottom:16px; }
+
+    /* FORM */
+    .field { margin-bottom:16px; }
+    label { display:block; font-size:11px; color:#3A3A3A; letter-spacing:1px; font-weight:600; text-transform:uppercase; margin-bottom:8px; }
+    input, textarea, select { width:100%; background:#0C0C0C; border:1px solid #1E1E1E; border-radius:10px; padding:12px 16px; font-size:14px; color:#E8E8E8; outline:none; font-family:inherit; transition:border-color 0.2s; }
+    input:focus, textarea:focus, select:focus { border-color:#3A3A3A; }
+    input::placeholder, textarea::placeholder { color:#2A2A2A; }
+    textarea { resize:vertical; min-height:100px; }
+    select option { background:#111; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .btn { background:#E8E8E8; color:#0C0C0C; border:none; border-radius:10px; padding:14px 24px; font-size:14px; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
+    .btn:hover { opacity:0.9; }
+    .btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .btn-secondary { background:#1E1E1E; color:#E8E8E8; }
+
+    /* OUTPUT */
+    .output { background:#0C0C0C; border:1px solid #1E1E1E; border-radius:10px; padding:20px; margin-top:16px; font-size:14px; color:#505050; line-height:1.8; white-space:pre-wrap; min-height:120px; display:none; }
+    .output.visible { display:block; }
+    .output-actions { display:flex; gap:8px; margin-top:12px; }
+    .copy-btn { background:#1E1E1E; color:#505050; border:none; border-radius:8px; padding:8px 16px; font-size:12px; font-weight:600; cursor:pointer; }
+    .copy-btn:hover { color:#E8E8E8; }
+
+    /* UPGRADE BANNER */
+    .upgrade-banner { background:#111; border:1px solid #2A2A2A; border-radius:12px; padding:24px; text-align:center; }
+    .upgrade-banner h3 { font-size:16px; font-weight:700; color:#E8E8E8; margin-bottom:8px; }
+    .upgrade-banner p { font-size:13px; color:#3A3A3A; margin-bottom:16px; }
+
+    /* DASHBOARD GRID */
+    .dashboard-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px; }
+    .dashboard-card { background:#111; border:1px solid #1E1E1E; border-radius:16px; padding:24px; cursor:pointer; transition:border-color 0.2s; }
+    .dashboard-card:hover { border-color:#2A2A2A; }
+    .dashboard-card.locked { opacity:0.3; cursor:not-allowed; }
+    .dashboard-icon { font-size:20px; margin-bottom:16px; }
+    .dashboard-card h3 { font-size:15px; font-weight:700; color:#E8E8E8; margin-bottom:6px; }
+    .dashboard-card p { font-size:12px; color:#3A3A3A; line-height:1.6; }
+    .dashboard-badge { display:inline-block; font-size:9px; color:#3A3A3A; border:1px solid #1E1E1E; border-radius:4px; padding:2px 6px; margin-top:10px; letter-spacing:1px; }
+
+    /* SPINNER */
+    .spinner { display:inline-block; width:16px; height:16px; border:2px solid #2A2A2A; border-top-color:#E8E8E8; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:8px; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* TABLE */
+    table { width:100%; border-collapse:collapse; }
+    th { font-size:10px; color:#3A3A3A; letter-spacing:1px; text-transform:uppercase; padding:8px 12px; text-align:left; border-bottom:1px solid #1E1E1E; }
+    td { font-size:13px; color:#505050; padding:12px; border-bottom:1px solid #141414; }
+    tr:last-child td { border:none; }
+
+    @media(max-width:768px) {
+      .sidebar { display:none; }
+      .main { margin-left:0; padding:24px; }
+      .row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">OFFICE AI</div>
+
+  <div class="nav-section">HAUPTMENÜ</div>
+  <div class="nav-item active" onclick="showPage('dashboard')">
+    <span class="nav-icon">◈</span>
+    <span class="nav-label">Dashboard</span>
+  </div>
+
+  <div class="nav-section">FEATURES</div>
+  <div class="nav-item" onclick="showPage('document')" id="nav-document">
+    <span class="nav-icon">◇</span>
+    <span class="nav-label">Geschäftsdokumente</span>
+  </div>
+  <div class="nav-item" onclick="showPage('email')" id="nav-email">
+    <span class="nav-icon">✉</span>
+    <span class="nav-label">E-Mail Assistent</span>
+  </div>
+  <div class="nav-item" onclick="showPage('chatbot')" id="nav-chatbot">
+    <span class="nav-icon">◉</span>
+    <span class="nav-label">KI-Chatbot</span>
+  </div>
+  <div class="nav-item" onclick="showPage('crm')" id="nav-crm">
+    <span class="nav-icon">◐</span>
+    <span class="nav-label">Kundenverwaltung</span>
+  </div>
+  <div class="nav-item" onclick="showPage('support')" id="nav-support">
+    <span class="nav-icon">◎</span>
+    <span class="nav-label">Kundensupport</span>
+  </div>
+  <div class="nav-item" onclick="showPage('hr')" id="nav-hr">
+    <span class="nav-icon">◑</span>
+    <span class="nav-label">HR-Assistent</span>
+  </div>
+  <div class="nav-item" onclick="showPage('analyst')" id="nav-analyst">
+    <span class="nav-icon">◒</span>
+    <span class="nav-label">Unternehmens-Analyst</span>
+  </div>
+  <div class="nav-item" onclick="showPage('competitor')" id="nav-competitor">
+    <span class="nav-icon">◓</span>
+    <span class="nav-label">Konkurrenz-Analyse</span>
+  </div>
+
+  <div class="nav-section">TEAM</div>
+  <div class="nav-item" onclick="showPage('team')" id="nav-team">
+    <span class="nav-icon">◔</span>
+    <span class="nav-label">Team verwalten</span>
+  </div>
+  <div class="nav-item" onclick="showPage('settings')" id="nav-settings">
+    <span class="nav-icon">⚙</span>
+    <span class="nav-label">Einstellungen</span>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="plan-badge" id="planBadge">STARTER</div>
+    <div class="user-info" id="userInfo">—</div>
+    <button class="logout-btn" onclick="handleLogout()">Abmelden</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-label">DASHBOARD</div>
+    <div class="page-title" id="dashTitle">Guten Tag</div>
+    <div class="page-subtitle" id="dashDate"></div>
+    <div class="dashboard-grid" id="dashGrid"></div>
+  </div>
+
+  <!-- DOKUMENTE -->
+  <div class="page" id="page-document">
+    <div class="page-label">FEATURE</div>
+    <div class="page-title">Geschäftsdokumente</div>
+    <div class="page-subtitle">Offerten, Rechnungen und Mahnungen in Sekunden.</div>
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label>Dokumenttyp</label>
+          <select id="doc-type">
+            <option value="offerte">Offerte</option>
+            <option value="rechnung">Rechnung</option>
+            <option value="mahnung">Mahnung</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Sprache</label>
+          <select id="doc-lang">
+            <option value="de">Deutsch</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="it">Italiano</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Ihr Firmenname</label>
+          <input type="text" id="doc-company" placeholder="Mustermann GmbH"/>
+        </div>
+        <div class="field">
+          <label>Kunde</label>
+          <input type="text" id="doc-client" placeholder="Kunde AG"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Leistung / Produkt</label>
+        <textarea id="doc-service" placeholder="Beschreiben Sie die Leistung oder das Produkt..."></textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Betrag (CHF)</label>
+          <input type="number" id="doc-amount" placeholder="1500"/>
+        </div>
+        <div class="field">
+          <label>MwSt (%)</label>
+          <input type="number" id="doc-vat" placeholder="8.1" value="8.1"/>
+        </div>
+      </div>
+      <button class="btn" onclick="generateDocument()">Dokument generieren</button>
+      <div class="output" id="doc-output"></div>
+      <div class="output-actions" id="doc-actions" style="display:none">
+        <button class="copy-btn" onclick="copyOutput('doc-output')">Kopieren</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="page" id="page-email">
+    <div class="page-label">FEATURE</div>
+    <div class="page-title">E-Mail Assistent</div>
+    <div class="page-subtitle">Professionelle E-Mails auf Knopfdruck.</div>
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label>Empfänger</label>
+          <input type="text" id="email-to" placeholder="Max Mustermann"/>
+        </div>
+        <div class="field">
+          <label>Ton</label>
+          <select id="email-tone">
+            <option value="professionell">Professionell</option>
+            <option value="freundlich">Freundlich</option>
+            <option value="formell">Formell</option>
+            <option value="kurz">Kurz & knapp</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Betreff</label>
+        <input type="text" id="email-subject" placeholder="Worum geht es?"/>
+      </div>
+      <div class="field">
+        <label>Inhalt</label>
+        <textarea id="email-content" placeholder="Was soll die E-Mail beinhalten?"></textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Sprache</label>
+          <select id="email-lang">
+            <option value="de">Deutsch</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="it">Italiano</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="generateEmail()">E-Mail generieren</button>
+      <div class="output" id="email-output"></div>
+      <div class="output-actions" id="email-actions" style="display:none">
+        <button class="copy-btn" onclick="copyOutput('email-output')">Kopieren</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HR -->
+  <div class="page" id="page-hr">
+    <div class="page-label">FEATURE</div>
+    <div class="page-title">HR-Assistent</div>
+    <div class="page-subtitle">Stelleninserate, Absagen und Bewerbungsprüfungen.</div>
+    <div class="card">
+      <div class="field">
+        <label>Aufgabe</label>
+        <select id="hr-type">
+          <option value="job">Stelleninserat schreiben</option>
+          <option value="reject">Absage schreiben</option>
+          <option value="screen">Bewerbung prüfen</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Details</label>
+        <textarea id="hr-content" placeholder="Beschreiben Sie die Stelle, den Bewerber oder fügen Sie den Lebenslauf ein..." style="min-height:160px;"></textarea>
+      </div>
+      <div class="field">
+        <label>Sprache</label>
+        <select id="hr-lang">
+          <option value="de">Deutsch</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
+      <button class="btn" onclick="generateHR()">Generieren</button>
+      <div class="output" id="hr-output"></div>
+      <div class="output-actions" id="hr-actions" style="display:none">
+        <button class="copy-btn" onclick="copyOutput('hr-output')">Kopieren</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="page" id="page-support">
+    <div class="page-label">FEATURE</div>
+    <div class="page-title">Kundensupport</div>
+    <div class="page-subtitle">Professionelle Antworten auf Kundenanfragen.</div>
+    <div class="card">
+      <div class="field">
+        <label>Kundenanfrage</label>
+        <textarea id="support-query" placeholder="Kopieren Sie die Kundenanfrage hier rein..." style="min-height:120px;"></textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Ihr Produkt / Dienst</label>
+          <input type="text" id="support-product" placeholder="z.B. Software, Beratung..."/>
+        </div>
+        <div class="field">
+          <label>Sprache</label>
+          <select id="support-lang">
+            <option value="de">Deutsch</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="it">Italiano</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="generateSupport()">Antwort generieren</button>
+      <div class="output" id="support-output"></div>
+      <div class="output-actions" id="support-actions" style="display:none">
+        <button class="copy-btn" onclick="copyOutput('support-output')">Kopieren</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYST -->
+  <div class="page" id="page-analyst">
+    <div class="page-label">FEATURE</div>
+    <div class="page-title">Unternehmens-Analyst</div>
+    <div class="page-subtitle">KI-Briefing mit Kennzahlen und Handlungsempfehlungen.</div>
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label>Umsatz diesen Monat (CHF)</label>
+          <input type="number" id="analyst-revenue" placeholder="50000"/>
+        </div>
+        <div class="field">
+          <label>Umsatzziel (CHF)</label>
+          <input type="number" id="analyst-goal" placeholder="60000"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Offene Rechnungen (CHF)</label>
+          <input type="number" id="analyst-invoices" placeholder="12000"/>
+        </div>
+        <div class="field">
+          <label>Liquidität (CHF)</label>
+          <input type="number" id="analyst-liquidity" placeholder="80000"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Neue Kunden</label>
+          <input type="number" id="analyst-customers" placeholder="3"/>
+        </div>
+        <div class="field">
+          <label>Kosten diesen Monat (CHF)</label>
+          <input type="number" id="analyst-costs" placeholder="35000"/>
+        </div>
+      </div>
+      <button class="btn" onclick="generateAnalyst()">Briefing generieren</button>
+      <div class="output" id="analyst-output"></div>
+    </div>
+  </div>
+
+  <!-- CHATBOT -->
+  <div class="page" id="page-chatbot">
+    <div class="page-label">FEATURE</div>
+    <div class="page-title">KI-Chatbot</div>
+    <div class="page-subtitle">Konfigurieren Sie Ihren Chatbot für Ihre Webseite.</div>
+    <div class="card">
+      <p style="font-size:14px; color:#3A3A3A;">Chatbot-Konfiguration ist in der App verfügbar. Den Code-Snippet für Ihre Webseite finden Sie nach der Konfiguration.</p>
+    </div>
+  </div>
+
+  <!-- CRM -->
+  <div class="page" id="page-crm">
+    <div class="page-label">FEATURE</div>
+    <div class="page-title">Kundenverwaltung</div>
+    <div class="page-subtitle">Ihre Kontakte und Pipeline.</div>
+    <div class="card">
+      <p style="font-size:14px; color:#3A3A3A;">CRM wird in Kürze in der Web-App verfügbar sein.</p>
+    </div>
+  </div>
+
+  <!-- COMPETITOR -->
+  <div class="page" id="page-competitor">
+    <div class="page-label">FEATURE</div>
+    <div class="page-title">Konkurrenz-Analyse</div>
+    <div class="page-subtitle">Beobachten Sie automatisch was Ihre Konkurrenten machen.</div>
+    <div class="card">
+      <p style="font-size:14px; color:#3A3A3A;">Konkurrenz-Analyse wird in Kürze in der Web-App verfügbar sein.</p>
+    </div>
+  </div>
+
+  <!-- TEAM -->
+  <div class="page" id="page-team">
+    <div class="page-label">TEAM</div>
+    <div class="page-title">Team verwalten</div>
+    <div class="page-subtitle">Mitglieder einladen und verwalten.</div>
+    <div class="card" id="team-card">
+      <p style="font-size:14px; color:#3A3A3A;">Wird geladen...</p>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="page-label">EINSTELLUNGEN</div>
+    <div class="page-title">Einstellungen</div>
+    <div class="page-subtitle">Abo, Sprache und Profil.</div>
+    <div class="card">
+      <div class="card-title">Aktuelles Abo</div>
+      <div id="settings-plan-info" style="font-size:14px; color:#505050;"></div>
+      <br/>
+      <button class="btn btn-secondary" onclick="openPortal()">Abo verwalten / kündigen</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Sprache</div>
+      <div class="field">
+        <select id="settings-lang" onchange="saveLanguage(this.value)">
+          <option value="de">Deutsch</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="it">Italiano</option>
+          <option value="es">Español</option>
+          <option value="pt">Português</option>
+          <option value="nl">Nederlands</option>
+          <option value="pl">Polski</option>
+          <option value="tr">Türkçe</option>
+          <option value="ar">العربية</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://zccpcatyyxmpagqjkfrz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjY3BjYXR5eXhtcGFncWprZnJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1OTU5MDIsImV4cCI6MjA2MTE3MTkwMn0.ILVDY_cqgHLiCqEbfNBCfPSBRBSZTHqZ7jJEGBNfvJc';
+const STRIPE_URL = 'https://zccpcatyyxmpagqjkfrz.supabase.co/functions/v1/stripe-checkout';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const PLAN_FEATURES = {
+  starter:  ['document', 'email', 'chatbot', 'crm', 'team'],
+  business: ['document', 'email', 'chatbot', 'crm', 'support', 'hr', 'analyst', 'team'],
+  pro:      ['document', 'email', 'chatbot', 'crm', 'support', 'hr', 'analyst', 'competitor', 'team'],
+};
+
+let currentUser = null;
+let currentProfile = null;
+let accessToken = null;
+
+const MODULES = [
+  { id: 'document',   icon: '◇', title: 'Geschäftsdokumente', desc: 'Offerten, Rechnungen und Mahnungen in Sekunden.', plan: 'STARTER' },
+  { id: 'email',      icon: '✉', title: 'E-Mail Assistent',   desc: 'Professionelle E-Mails auf Knopfdruck.',          plan: 'STARTER' },
+  { id: 'chatbot',    icon: '◉', title: 'KI-Chatbot',         desc: 'Chatbot für Ihre Webseite.',                       plan: 'STARTER' },
+  { id: 'crm',        icon: '◐', title: 'Kundenverwaltung',   desc: 'Kontakte und Pipeline.',                           plan: 'STARTER' },
+  { id: 'support',    icon: '◎', title: 'Kundensupport',      desc: 'Professionelle Antworten auf Anfragen.',           plan: 'BUSINESS' },
+  { id: 'hr',         icon: '◑', title: 'HR-Assistent',       desc: 'Stelleninserate und Bewerbungsprüfungen.',         plan: 'BUSINESS' },
+  { id: 'analyst',    icon: '◒', title: 'Unternehmens-Analyst','desc': 'KI-Briefing mit Kennzahlen.',                   plan: 'BUSINESS' },
+  { id: 'competitor', icon: '◓', title: 'Konkurrenz-Analyse', desc: 'Automatische Konkurrenzbeobachtung.',              plan: 'PRO' },
+];
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+
+  currentUser = session.user;
+  accessToken = session.access_token;
+
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  currentProfile = profile;
+
+  const plan = profile?.plan || 'starter';
+  const allowed = PLAN_FEATURES[plan] || PLAN_FEATURES.starter;
+
+  document.getElementById('planBadge').textContent = plan.toUpperCase();
+  document.getElementById('userInfo').textContent = (profile?.full_name || '') + '\n' + (profile?.company_name || '');
+
+  // Dashboard aufbauen
+  const grid = document.getElementById('dashGrid');
+  grid.innerHTML = '';
+  MODULES.forEach(m => {
+    const isLocked = !allowed.includes(m.id);
+    const card = document.createElement('div');
+    card.className = 'dashboard-card' + (isLocked ? ' locked' : '');
+    card.innerHTML = `
+      <div class="dashboard-icon">${m.icon}</div>
+      <h3>${m.title}</h3>
+      <p>${m.desc}</p>
+      <span class="dashboard-badge">${m.plan}</span>
+    `;
+    if (!isLocked) card.onclick = () => showPage(m.id);
+    grid.appendChild(card);
+  });
+
+  // Nav-Items sperren
+  MODULES.forEach(m => {
+    const nav = document.getElementById('nav-' + m.id);
+    if (nav && !allowed.includes(m.id)) nav.classList.add('locked');
+  });
+
+  // Datum
+  const today = new Date().toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' });
+  document.getElementById('dashDate').textContent = today;
+  document.getElementById('dashTitle').textContent = 'Guten Tag, ' + (profile?.full_name?.split(' ')[0] || '');
+
+  // Settings
+  document.getElementById('settings-plan-info').textContent =
+    plan.charAt(0).toUpperCase() + plan.slice(1) + ' Plan';
+  if (profile?.language) {
+    document.getElementById('settings-lang').value = profile.language;
+  }
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id)?.classList.add('active');
+  document.getElementById('nav-' + id)?.classList.add('active');
+  if (id === 'dashboard') document.querySelector('.nav-item').classList.add('active');
+  if (id === 'team') loadTeam();
+}
+
+async function callEdgeFunction(fnName, body) {
+  const { data: { session } } = await sb.auth.getSession();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/${fnName}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+function setOutput(id, text) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.classList.add('visible');
+  const actions = document.getElementById(id.replace('output', 'actions'));
+  if (actions) actions.style.display = 'flex';
+}
+
+function setLoading(btnEl, loading, label) {
+  btnEl.disabled = loading;
+  btnEl.innerHTML = loading ? '<span class="spinner"></span>Wird generiert...' : label;
+}
+
+async function generateDocument() {
+  const btn = event.target;
+  setLoading(btn, true, 'Dokument generieren');
+  const data = await callEdgeFunction('generate-document', {
+    type: document.getElementById('doc-type').value,
+    language: document.getElementById('doc-lang').value,
+    company: document.getElementById('doc-company').value,
+    client: document.getElementById('doc-client').value,
+    service: document.getElementById('doc-service').value,
+    amount: document.getElementById('doc-amount').value,
+    vat: document.getElementById('doc-vat').value,
+  });
+  setOutput('doc-output', data.document || data.error || 'Fehler');
+  setLoading(btn, false, 'Dokument generieren');
+}
+
+async function generateEmail() {
+  const btn = event.target;
+  setLoading(btn, true, 'E-Mail generieren');
+  const data = await callEdgeFunction('ai-assistant', {
+    type: 'email',
+    language: document.getElementById('email-lang').value,
+    recipient: document.getElementById('email-to').value,
+    subject: document.getElementById('email-subject').value,
+    content: document.getElementById('email-content').value,
+    tone: document.getElementById('email-tone').value,
+  });
+  setOutput('email-output', data.result || data.error || 'Fehler');
+  setLoading(btn, false, 'E-Mail generieren');
+}
+
+async function generateHR() {
+  const btn = event.target;
+  setLoading(btn, true, 'Generieren');
+  const data = await callEdgeFunction('ai-assistant', {
+    type: 'hr_' + document.getElementById('hr-type').value,
+    language: document.getElementById('hr-lang').value,
+    content: document.getElementById('hr-content').value,
+  });
+  setOutput('hr-output', data.result || data.error || 'Fehler');
+  setLoading(btn, false, 'Generieren');
+}
+
+async function generateSupport() {
+  const btn = event.target;
+  setLoading(btn, true, 'Antwort generieren');
+  const data = await callEdgeFunction('support-handler', {
+    language: document.getElementById('support-lang').value,
+    query: document.getElementById('support-query').value,
+    product: document.getElementById('support-product').value,
+  });
+  setOutput('support-output', data.result || data.error || 'Fehler');
+  setLoading(btn, false, 'Antwort generieren');
+}
+
+async function generateAnalyst() {
+  const btn = event.target;
+  setLoading(btn, true, 'Briefing generieren');
+  const data = await callEdgeFunction('ai-assistant', {
+    type: 'analyst',
+    language: currentProfile?.language || 'de',
+    revenue: document.getElementById('analyst-revenue').value,
+    goal: document.getElementById('analyst-goal').value,
+    invoices: document.getElementById('analyst-invoices').value,
+    liquidity: document.getElementById('analyst-liquidity').value,
+    customers: document.getElementById('analyst-customers').value,
+    costs: document.getElementById('analyst-costs').value,
+  });
+  setOutput('analyst-output', data.result || data.error || 'Fehler');
+  setLoading(btn, false, 'Briefing generieren');
+}
+
+function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Kopiert ✓';
+    setTimeout(() => btn.textContent = 'Kopieren', 2000);
+  });
+}
+
+async function loadTeam() {
+  const card = document.getElementById('team-card');
+  const { data: member } = await sb.from('workspace_members').select('*, workspaces(*)').eq('user_id', currentUser.id).single();
+  if (!member?.workspaces) { card.innerHTML = '<p style="color:#3A3A3A;">Kein Workspace gefunden.</p>'; return; }
+
+  const ws = member.workspaces;
+  const { data: allMembers } = await sb.from('workspace_members').select('*, profiles(full_name)').eq('workspace_id', ws.id);
+
+  card.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div>
+        <div style="font-size:16px; font-weight:700; color:#E8E8E8; margin-bottom:4px;">${ws.name}</div>
+        <div style="font-size:12px; color:#3A3A3A;">${allMembers?.length || 0} / ${ws.max_members} User</div>
+      </div>
+      <span style="font-size:9px; color:#3A3A3A; border:1px solid #2A2A2A; border-radius:6px; padding:4px 10px; letter-spacing:2px;">${ws.plan?.toUpperCase()}</span>
+    </div>
+    <table>
+      <thead><tr><th>Name</th><th>Rolle</th></tr></thead>
+      <tbody>
+        ${(allMembers || []).map(m => `
+          <tr>
+            <td>${m.profiles?.full_name || '—'}</td>
+            <td>${m.role === 'admin' ? '👑 Admin' : 'Mitglied'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+async function saveLanguage(lang) {
+  await sb.from('profiles').update({ language: lang }).eq('id', currentUser.id);
+}
+
+async function openPortal() {
+  const { data: { session } } = await sb.auth.getSession();
+  const res = await fetch(STRIPE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+    body: JSON.stringify({ action: 'portal' }),
+  });
+  const data = await res.json();
+  if (data.url) window.open(data.url, '_blank');
+  else alert('Kein aktives Abonnement gefunden.');
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+init();
+</script>
+</body>
+</html>

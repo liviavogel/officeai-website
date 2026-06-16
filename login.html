@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – Office AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,'Helvetica Neue',Arial,sans-serif; background:#0C0C0C; color:#E8E8E8; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+    .container { width:100%; max-width:420px; padding:48px 32px; }
+    .logo { font-size:12px; font-weight:700; letter-spacing:5px; color:#fff; text-align:center; margin-bottom:48px; }
+    h1 { font-size:28px; font-weight:700; letter-spacing:-0.8px; color:#fff; margin-bottom:8px; text-align:center; }
+    .subtitle { font-size:14px; color:#3A3A3A; text-align:center; margin-bottom:40px; }
+    .tabs { display:flex; gap:0; margin-bottom:32px; border:1px solid #1E1E1E; border-radius:10px; overflow:hidden; }
+    .tab { flex:1; padding:12px; text-align:center; font-size:13px; font-weight:600; color:#3A3A3A; cursor:pointer; background:#0C0C0C; border:none; transition:all 0.2s; }
+    .tab.active { background:#1E1E1E; color:#E8E8E8; }
+    .field { margin-bottom:16px; }
+    label { display:block; font-size:11px; color:#3A3A3A; letter-spacing:1px; font-weight:600; text-transform:uppercase; margin-bottom:8px; }
+    input { width:100%; background:#111; border:1px solid #1E1E1E; border-radius:10px; padding:14px 16px; font-size:14px; color:#E8E8E8; outline:none; transition:border-color 0.2s; }
+    input:focus { border-color:#3A3A3A; }
+    input::placeholder { color:#2A2A2A; }
+    .btn { width:100%; background:#E8E8E8; color:#0C0C0C; border:none; border-radius:10px; padding:16px; font-size:14px; font-weight:700; cursor:pointer; margin-top:8px; transition:opacity 0.2s; }
+    .btn:hover { opacity:0.9; }
+    .btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .error { background:#1A0A0A; border:1px solid #3A1A1A; border-radius:8px; padding:12px 16px; font-size:13px; color:#FF6666; margin-bottom:16px; display:none; }
+    .success { background:#0A1A0A; border:1px solid #1A3A1A; border-radius:8px; padding:12px 16px; font-size:13px; color:#66FF66; margin-bottom:16px; display:none; }
+    .divider { height:1px; background:#141414; margin:24px 0; }
+    .back { display:block; text-align:center; font-size:12px; color:#2A2A2A; margin-top:24px; text-decoration:none; }
+    .back:hover { color:#505050; }
+    .register-fields { display:none; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">OFFICE AI</div>
+  <h1 id="title">Willkommen zurück</h1>
+  <p class="subtitle" id="subtitle">Melden Sie sich in Ihrem Konto an.</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('login')">Anmelden</button>
+    <button class="tab" onclick="switchTab('register')">Registrieren</button>
+  </div>
+
+  <div id="errorBox" class="error"></div>
+  <div id="successBox" class="success"></div>
+
+  <div class="field register-fields" id="nameField">
+    <label>Vollständiger Name</label>
+    <input type="text" id="fullName" placeholder="Max Mustermann"/>
+  </div>
+  <div class="field register-fields" id="companyField">
+    <label>Firmenname</label>
+    <input type="text" id="companyName" placeholder="Mustermann GmbH"/>
+  </div>
+  <div class="field">
+    <label>E-Mail</label>
+    <input type="email" id="email" placeholder="name@firma.ch"/>
+  </div>
+  <div class="field">
+    <label>Passwort</label>
+    <input type="password" id="password" placeholder="••••••••"/>
+  </div>
+
+  <button class="btn" id="submitBtn" onclick="handleSubmit()">Anmelden</button>
+
+  <a href="index.html" class="back">← Zurück zur Webseite</a>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://zccpcatyyxmpagqjkfrz.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjY3BjYXR5eXhtcGFncWprZnJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1OTU5MDIsImV4cCI6MjA2MTE3MTkwMn0.ILVDY_cqgHLiCqEbfNBCfPSBRBSZTHqZ7jJEGBNfvJc';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let mode = 'login';
+
+  // Bereits eingeloggt?
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.href = 'app.html';
+  });
+
+  function switchTab(newMode) {
+    mode = newMode;
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0 && newMode === 'login') || (i === 1 && newMode === 'register'));
+    });
+    document.querySelectorAll('.register-fields').forEach(el => {
+      el.style.display = newMode === 'register' ? 'block' : 'none';
+    });
+    document.getElementById('title').textContent = newMode === 'login' ? 'Willkommen zurück' : 'Konto erstellen';
+    document.getElementById('subtitle').textContent = newMode === 'login' ? 'Melden Sie sich in Ihrem Konto an.' : 'Erstellen Sie Ihr Office AI Konto.';
+    document.getElementById('submitBtn').textContent = newMode === 'login' ? 'Anmelden' : 'Konto erstellen';
+    hideMessages();
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorBox');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('successBox').style.display = 'none';
+  }
+
+  function showSuccess(msg) {
+    const el = document.getElementById('successBox');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('errorBox').style.display = 'none';
+  }
+
+  function hideMessages() {
+    document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('successBox').style.display = 'none';
+  }
+
+  async function handleSubmit() {
+    const btn = document.getElementById('submitBtn');
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) { showError('Bitte E-Mail und Passwort eingeben.'); return; }
+
+    btn.disabled = true;
+    btn.textContent = '...';
+    hideMessages();
+
+    if (mode === 'login') {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        showError('Anmeldung fehlgeschlagen. Bitte E-Mail und Passwort prüfen.');
+        btn.disabled = false;
+        btn.textContent = 'Anmelden';
+      } else {
+        window.location.href = 'app.html';
+      }
+    } else {
+      const fullName = document.getElementById('fullName').value.trim();
+      const companyName = document.getElementById('companyName').value.trim();
+      if (!fullName || !companyName) { showError('Bitte alle Felder ausfüllen.'); btn.disabled = false; btn.textContent = 'Konto erstellen'; return; }
+
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) {
+        showError('Registrierung fehlgeschlagen: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = 'Konto erstellen';
+      } else {
+        // Profil speichern
+        if (data.user) {
+          await sb.from('profiles').upsert({
+            id: data.user.id,
+            full_name: fullName,
+            company_name: companyName,
+            plan: 'starter',
+            language: 'de',
+          });
+          // Workspace erstellen
+          const { data: ws } = await sb.from('workspaces').insert({
+            name: companyName,
+            plan: 'starter',
+            max_members: 5,
+          }).select().single();
+          if (ws) {
+            await sb.from('workspace_members').insert({
+              workspace_id: ws.id,
+              user_id: data.user.id,
+              role: 'admin',
+            });
+          }
+        }
+        showSuccess('Konto erstellt! Bitte E-Mail bestätigen und dann anmelden.');
+        btn.disabled = false;
+        btn.textContent = 'Konto erstellen';
+      }
+    }
+  }
+
+  // Enter-Taste
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleSubmit();
+  });
+</script>
+</body>
+</html>
