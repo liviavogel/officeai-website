@@ -138,22 +138,42 @@
       const companyName = document.getElementById('companyName').value.trim();
       if (!fullName || !companyName) { showError('Bitte alle Felder ausfüllen.'); btn.disabled = false; btn.textContent = 'Konto erstellen'; return; }
 
-      const { data, error } = await sb.auth.signUp({ email, password });
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName, company_name: companyName }
+        }
+      });
       if (error) {
         showError('Registrierung fehlgeschlagen: ' + error.message);
         btn.disabled = false;
         btn.textContent = 'Konto erstellen';
-      } else {
-        // Profil speichern
-        if (data.user) {
+        return;
+      }
+
+      showSuccess('Konto erstellt! Sie werden angemeldet...');
+
+      // Versuche direkt einzuloggen
+      const { error: loginError } = await sb.auth.signInWithPassword({ email, password });
+      if (loginError) {
+        showSuccess('Konto erstellt! Bitte melden Sie sich an.');
+        btn.disabled = false;
+        btn.textContent = 'Konto erstellen';
+        return;
+      }
+
+      // Profil und Workspace im Hintergrund erstellen (Fehler hier blockieren nicht)
+      try {
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) {
           await sb.from('profiles').upsert({
-            id: data.user.id,
+            id: user.id,
             full_name: fullName,
             company_name: companyName,
             plan: 'starter',
             language: 'de',
           });
-          // Workspace erstellen
           const { data: ws } = await sb.from('workspaces').insert({
             name: companyName,
             plan: 'starter',
@@ -162,15 +182,16 @@
           if (ws) {
             await sb.from('workspace_members').insert({
               workspace_id: ws.id,
-              user_id: data.user.id,
+              user_id: user.id,
               role: 'admin',
             });
           }
         }
-        showSuccess('Konto erstellt! Bitte E-Mail bestätigen und dann anmelden.');
-        btn.disabled = false;
-        btn.textContent = 'Konto erstellen';
+      } catch (e) {
+        console.error('Profil-Erstellung fehlgeschlagen:', e);
       }
+
+      window.location.href = 'app.html';
     }
   }
 
