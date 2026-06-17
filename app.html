@@ -85,6 +85,77 @@
     td { font-size:13px; color:#505050; padding:12px; border-bottom:1px solid #141414; }
     tr:last-child td { border:none; }
 
+    /* TABS */
+    .tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+    .tab { padding:8px 14px; border-radius:8px; border:1px solid #1E1E1E; font-size:12px; color:#3A3A3A; font-weight:500; cursor:pointer; transition:all 0.15s; }
+    .tab:hover { border-color:#2A2A2A; }
+    .tab.active { background:#E8E8E8; color:#0C0C0C; font-weight:700; border-color:#E8E8E8; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* SWITCH */
+    .switch-row { display:flex; align-items:center; padding:16px 0; border-bottom:1px solid #141414; margin-top:8px; gap:12px; }
+    .switch-label { font-size:14px; font-weight:600; color:#E8E8E8; margin-bottom:2px; }
+    .switch-desc { font-size:11px; color:#3A3A3A; }
+    .switch { position:relative; display:inline-block; width:42px; height:24px; flex-shrink:0; }
+    .switch input { opacity:0; width:0; height:0; }
+    .switch-slider { position:absolute; cursor:pointer; inset:0; background:#1E1E1E; border-radius:24px; transition:0.2s; }
+    .switch-slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:#3D3D3D; border-radius:50%; transition:0.2s; }
+    .switch input:checked + .switch-slider { background:#E8E8E8; }
+    .switch input:checked + .switch-slider:before { transform:translateX(18px); background:#0C0C0C; }
+
+    /* FILTER CHIPS */
+    .filter-row { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+    .filter-chip { padding:6px 12px; border-radius:8px; border:1px solid #1E1E1E; font-size:11px; color:#3A3A3A; font-weight:500; cursor:pointer; transition:all 0.15s; }
+    .filter-chip:hover { border-color:#2A2A2A; }
+    .filter-chip.active { background:#E8E8E8; color:#0C0C0C; font-weight:700; border-color:#E8E8E8; }
+
+    /* CONTACT / COMPETITOR CARDS */
+    .contact-card { display:flex; align-items:center; gap:14px; background:#111; border:1px solid #1E1E1E; border-radius:14px; padding:16px; margin-bottom:8px; cursor:pointer; transition:border-color 0.15s; }
+    .contact-card:hover { border-color:#2A2A2A; }
+    .contact-avatar { width:40px; height:40px; border-radius:20px; background:#1A1A1A; border:1px solid #2A2A2A; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:16px; font-weight:600; color:#505050; }
+    .contact-body { flex:1; min-width:0; }
+    .contact-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px; }
+    .contact-name { font-size:14px; font-weight:600; color:#E8E8E8; letter-spacing:-0.2px; }
+    .stage-badge { padding:2px 8px; border-radius:4px; font-size:9px; font-weight:700; letter-spacing:1px; }
+    .contact-company { font-size:11px; color:#3A3A3A; margin-bottom:2px; }
+    .contact-bottom { display:flex; align-items:center; gap:10px; }
+    .contact-info { font-size:11px; color:#2E2E2E; }
+    .task-badge { background:#1A1A2A; color:#4A4A7A; padding:2px 8px; border-radius:4px; font-size:9px; font-weight:700; letter-spacing:0.5px; }
+    .contact-arrow { font-size:20px; color:#2A2A2A; }
+
+    .competitor-card { display:flex; align-items:center; background:#111; border:1px solid #1E1E1E; border-radius:12px; padding:16px; margin-bottom:8px; }
+    .competitor-name { font-size:14px; font-weight:600; color:#E8E8E8; }
+    .competitor-url { font-size:11px; color:#3A3A3A; margin-top:2px; }
+    .competitor-delete { font-size:16px; color:#3A3A3A; cursor:pointer; padding-left:12px; background:none; border:none; }
+    .competitor-delete:hover { color:#9B5050; }
+
+    .report-card { background:#111; border:1px solid #1E1E1E; border-radius:12px; padding:16px; margin-bottom:12px; }
+    .report-date { font-size:10px; color:#3A3A3A; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+    .report-text { font-size:13px; color:#C8C8C6; line-height:1.6; }
+
+    /* PLATFORM / SERVICE CARDS (chatbot installation) */
+    .platform-card { display:flex; align-items:center; gap:14px; background:#111; border:1px solid #1E1E1E; border-radius:14px; padding:16px; margin-bottom:10px; cursor:pointer; transition:border-color 0.15s; }
+    .platform-card:hover { border-color:#2A2A2A; }
+    .platform-icon-box { width:40px; height:40px; border-radius:10px; background:#161616; border:1px solid #202020; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:16px; }
+    .platform-name { flex:1; font-size:14px; font-weight:600; color:#E8E8E8; }
+    .platform-arrow { width:26px; height:26px; border-radius:13px; border:1px solid #1E1E1E; display:flex; align-items:center; justify-content:center; color:#2E2E2E; font-size:11px; flex-shrink:0; }
+    .service-card { display:flex; align-items:center; gap:14px; background:#111; border:1px solid #2A2A2A; border-radius:14px; padding:16px; cursor:pointer; transition:border-color 0.15s; margin-top:8px; }
+    .service-card:hover { border-color:#3A3A3A; }
+    .step-row { display:flex; gap:14px; margin-bottom:14px; align-items:flex-start; }
+    .step-num { width:28px; height:28px; border-radius:14px; background:#1A1A1A; border:1px solid #2A2A2A; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:11px; font-weight:700; color:#E8E8E8; }
+    .step-text { flex:1; font-size:13px; color:#C0C0C0; line-height:1.6; padding-top:4px; }
+    .tip-card { background:#111; border:1px solid #1E1E1E; border-radius:10px; padding:14px; margin:4px 0 20px; font-size:12px; color:#505050; line-height:1.6; }
+    .code-box { background:#111; border:1px solid #1E1E1E; border-radius:10px; padding:16px; margin-bottom:16px; font-size:11px; color:#505050; font-family:'Courier New',monospace; line-height:1.6; white-space:pre-wrap; word-break:break-all; }
+    .back-link { font-size:13px; color:#505050; cursor:pointer; background:none; border:none; padding:0; margin-bottom:20px; display:block; }
+    .back-link:hover { color:#E8E8E8; }
+
+    .lead-card { background:#111; border:1px solid #1E1E1E; border-radius:12px; padding:16px; margin-bottom:8px; }
+    .lead-name { font-size:14px; font-weight:700; color:#E8E8E8; margin-bottom:2px; }
+    .lead-info { font-size:13px; color:#505050; }
+    .lead-summary { font-size:12px; color:#3A3A3A; margin-top:4px; line-height:1.6; }
+    .lead-date { font-size:10px; color:#2A2A2A; margin-top:6px; letter-spacing:1px; }
+
     @media(max-width:768px) {
       .sidebar { display:none; }
       .main { margin-left:0; padding:24px; }
@@ -384,8 +455,72 @@
     <div class="page-label">FEATURE</div>
     <div class="page-title">KI-Chatbot</div>
     <div class="page-subtitle">Konfigurieren Sie Ihren Chatbot für Ihre Webseite.</div>
-    <div class="card">
-      <p style="font-size:14px; color:#3A3A3A;">Chatbot-Konfiguration ist in der App verfügbar. Den Code-Snippet für Ihre Webseite finden Sie nach der Konfiguration.</p>
+
+    <div class="tabs">
+      <div class="tab active" id="chatbot-tab-0" onclick="setChatbotTab(0)">Konfiguration</div>
+      <div class="tab" id="chatbot-tab-1" onclick="setChatbotTab(1)">Installation</div>
+      <div class="tab" id="chatbot-tab-2" onclick="setChatbotTab(2)">Leads</div>
+    </div>
+
+    <!-- TAB 0: Konfiguration -->
+    <div class="tab-panel active" id="chatbot-panel-0">
+      <div class="card">
+        <div class="field">
+          <label>Bot-Name</label>
+          <input type="text" id="chatbot-bot-name" placeholder="z.B. Lisa"/>
+        </div>
+        <div class="field">
+          <label>Firmenname</label>
+          <input type="text" id="chatbot-company-name" placeholder="z.B. Muster AG"/>
+        </div>
+        <div class="field">
+          <label>Was macht die Firma?</label>
+          <textarea id="chatbot-company-desc" placeholder="z.B. Schreinerei in Zürich, Küchen ab CHF 5000, kostenlose Beratung..."></textarea>
+        </div>
+        <div class="field">
+          <label>Willkommensnachricht</label>
+          <input type="text" id="chatbot-welcome-msg" value="Hallo! Wie kann ich Ihnen helfen?"/>
+        </div>
+        <div class="switch-row">
+          <div>
+            <div class="switch-label">Leads sammeln</div>
+            <div class="switch-desc">Bot fragt nach Name, Email &amp; Telefon</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="chatbot-collect-leads" checked onchange="toggleWebhookField()"/>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+        <div class="field" id="chatbot-webhook-field">
+          <label>Webhook URL (optional)</label>
+          <input type="text" id="chatbot-webhook-url" placeholder="https://... (Make.com, Zapier...)"/>
+        </div>
+        <button class="btn" id="chatbot-save-btn" onclick="saveChatbotConfig()">Speichern &amp; Aktivieren</button>
+      </div>
+    </div>
+
+    <!-- TAB 1: Installation -->
+    <div class="tab-panel" id="chatbot-panel-1">
+      <div id="chatbot-platform-list">
+        <div class="card-title" style="margin-bottom:14px;">Plattform wählen</div>
+        <div id="chatbot-platforms"></div>
+        <div class="card" style="margin-top:8px;">
+          <p style="font-size:12px; color:#3A3A3A; line-height:1.6;">Funktioniert bei 95% aller Webseiten. Nicht möglich bei Google Sites oder kostenlosen WordPress.com-Plänen.</p>
+        </div>
+        <div class="service-card" onclick="handleInstallRequest()">
+          <div style="flex:1;">
+            <div style="font-size:14px; font-weight:600; color:#E8E8E8; margin-bottom:3px;">Installation durch uns</div>
+            <div style="font-size:11px; color:#3A3A3A; line-height:1.6;">Wir installieren den Chatbot für Sie — ab CHF 49. Antwort innert 24h.</div>
+          </div>
+          <span style="color:#2E2E2E;">›</span>
+        </div>
+      </div>
+      <div id="chatbot-platform-detail" style="display:none;"></div>
+    </div>
+
+    <!-- TAB 2: Leads -->
+    <div class="tab-panel" id="chatbot-panel-2">
+      <div id="chatbot-leads-list"><p style="font-size:13px; color:#3A3A3A;">Wird geladen...</p></div>
     </div>
   </div>
 
@@ -394,9 +529,60 @@
     <div class="page-label">FEATURE</div>
     <div class="page-title">Kundenverwaltung</div>
     <div class="page-subtitle">Ihre Kontakte und Pipeline.</div>
-    <div class="card">
-      <p style="font-size:14px; color:#3A3A3A;">CRM wird in Kürze in der Web-App verfügbar sein.</p>
+
+    <div style="display:flex; gap:10px; margin-bottom:16px;">
+      <input type="text" id="crm-search" placeholder="Suchen..." oninput="renderContacts()" style="flex:1;"/>
+      <button class="btn" style="white-space:nowrap;" onclick="openAddContactForm()">+ Neu</button>
     </div>
+
+    <div class="filter-row" id="crm-filters"></div>
+
+    <div class="card" id="crm-form-card" style="display:none;">
+      <div class="card-title" id="crm-form-title">Neuer Kontakt</div>
+      <input type="hidden" id="crm-contact-id"/>
+      <div class="row">
+        <div class="field">
+          <label>Name</label>
+          <input type="text" id="crm-name" placeholder="Vorname Nachname"/>
+        </div>
+        <div class="field">
+          <label>Firma</label>
+          <input type="text" id="crm-company" placeholder="Firma AG"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>E-Mail</label>
+          <input type="text" id="crm-email" placeholder="name@firma.ch"/>
+        </div>
+        <div class="field">
+          <label>Telefon</label>
+          <input type="text" id="crm-phone" placeholder="+41 79 000 00 00"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Pipeline-Status</label>
+        <select id="crm-stage">
+          <option value="neu">Neu</option>
+          <option value="kontaktiert">Kontaktiert</option>
+          <option value="angebot">Angebot</option>
+          <option value="verhandlung">Verhandlung</option>
+          <option value="gewonnen">Gewonnen</option>
+          <option value="verloren">Verloren</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Notizen</label>
+        <textarea id="crm-notes" placeholder="Notizen zum Kontakt..."></textarea>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn" onclick="saveContact()">Speichern</button>
+        <button class="btn btn-secondary" onclick="closeContactForm()">Abbrechen</button>
+        <button class="btn btn-secondary" id="crm-delete-btn" style="display:none; margin-left:auto; background:#2A1A1A; color:#9B5050;" onclick="deleteContact()">Löschen</button>
+      </div>
+    </div>
+
+    <div id="crm-list"><p style="font-size:13px; color:#3A3A3A;">Wird geladen...</p></div>
   </div>
 
   <!-- COMPETITOR -->
@@ -404,8 +590,35 @@
     <div class="page-label">FEATURE</div>
     <div class="page-title">Konkurrenz-Analyse</div>
     <div class="page-subtitle">Beobachten Sie automatisch was Ihre Konkurrenten machen.</div>
-    <div class="card">
-      <p style="font-size:14px; color:#3A3A3A;">Konkurrenz-Analyse wird in Kürze in der Web-App verfügbar sein.</p>
+
+    <div class="tabs">
+      <div class="tab active" id="competitor-tab-0" onclick="setCompetitorTab(0)">Konkurrenten</div>
+      <div class="tab" id="competitor-tab-1" onclick="setCompetitorTab(1)">Berichte</div>
+    </div>
+
+    <!-- TAB 0: Konkurrenten -->
+    <div class="tab-panel active" id="competitor-panel-0">
+      <div class="card">
+        <div class="card-title">Konkurrent hinzufügen</div>
+        <div class="field">
+          <label>Name</label>
+          <input type="text" id="competitor-name" placeholder="z.B. Muster Schreinerei AG"/>
+        </div>
+        <div class="field">
+          <label>Webseite</label>
+          <input type="text" id="competitor-url" placeholder="z.B. muster-schreinerei.ch"/>
+        </div>
+        <button class="btn" onclick="addCompetitor()">+ Hinzufügen</button>
+      </div>
+
+      <button class="btn" style="width:100%; margin-bottom:16px;" id="competitor-analyze-btn" onclick="runCompetitorAnalysis()">🔍 Analyse jetzt starten</button>
+
+      <div id="competitor-list"><p style="font-size:13px; color:#3A3A3A;">Wird geladen...</p></div>
+    </div>
+
+    <!-- TAB 1: Berichte -->
+    <div class="tab-panel" id="competitor-panel-1">
+      <div id="competitor-reports-list"><p style="font-size:13px; color:#3A3A3A;">Wird geladen...</p></div>
     </div>
   </div>
 
@@ -540,6 +753,9 @@ function showPage(id) {
   document.getElementById('nav-' + id)?.classList.add('active');
   if (id === 'dashboard') document.querySelector('.nav-item').classList.add('active');
   if (id === 'team') loadTeam();
+  if (id === 'chatbot') loadChatbotConfig();
+  if (id === 'crm') loadContacts();
+  if (id === 'competitor') loadCompetitors();
 }
 
 async function callEdgeFunction(fnName, body) {
@@ -698,6 +914,416 @@ async function openPortal() {
 async function handleLogout() {
   await sb.auth.signOut();
   window.location.href = 'login.html';
+}
+
+/* =========================================================
+   KI-CHATBOT
+   ========================================================= */
+
+const PLATFORMS = [
+  { name: 'WordPress', icon: '◍', steps: [
+      'Gehe in dein WordPress-Dashboard',
+      'Klicke auf „Appearance" → „Theme Editor"',
+      'Öffne die Datei „header.php"',
+      'Füge den Code vor dem </head> Tag ein',
+      'Klicke auf „Update File" — fertig!',
+    ], tip: 'Alternativ: Plugin „Insert Headers and Footers" installieren → noch einfacher.' },
+  { name: 'Wix', icon: '◉', steps: [
+      'Öffne den Wix Editor deiner Webseite',
+      'Klicke oben links auf „Einstellungen"',
+      'Wähle „Erweitert" → „Custom Code"',
+      'Klicke auf „+ Code hinzufügen"',
+      'Füge den Code ein, wähle „Head" als Position',
+      'Speichern und Webseite veröffentlichen',
+    ], tip: 'Nur bei Wix Premium verfügbar.' },
+  { name: 'Squarespace', icon: '◻', steps: [
+      'Gehe zu „Einstellungen" in deinem Dashboard',
+      'Klicke auf „Erweitert" → „Code-Injektion"',
+      'Füge den Code in das Feld „Header" ein',
+      'Klicke auf „Speichern" — fertig!',
+    ], tip: 'Nur bei Business-Plan oder höher verfügbar.' },
+  { name: 'Shopify', icon: '◐', steps: [
+      'Gehe zu „Online Store" → „Themes"',
+      'Klicke auf „Aktionen" → „Code bearbeiten"',
+      'Öffne die Datei „theme.liquid"',
+      'Füge den Code vor dem </body> Tag ein',
+      'Klicke auf „Speichern" — fertig!',
+    ], tip: 'Funktioniert mit allen Shopify-Themes.' },
+  { name: 'Webflow', icon: '◓', steps: [
+      'Öffne dein Webflow-Projekt',
+      'Gehe zu „Project Settings" → „Custom Code"',
+      'Füge den Code in „Footer Code" ein',
+      'Klicke auf „Save Changes"',
+      'Webseite neu veröffentlichen',
+    ], tip: 'Gilt für alle Seiten des Projekts.' },
+  { name: 'HTML / Andere', icon: '◇', steps: [
+      'Öffne die HTML-Datei deiner Webseite',
+      'Suche den </body> Tag ganz unten',
+      'Füge den Code direkt davor ein',
+      'Datei speichern und hochladen — fertig!',
+    ], tip: 'Funktioniert bei jeder normalen HTML-Webseite.' },
+];
+
+let chatbotConfigId = null;
+
+function setChatbotTab(i) {
+  for (let n = 0; n < 3; n++) {
+    document.getElementById('chatbot-tab-' + n).classList.toggle('active', n === i);
+    document.getElementById('chatbot-panel-' + n).classList.toggle('active', n === i);
+  }
+  if (i === 1) renderPlatformList();
+  if (i === 2) loadChatbotLeads();
+}
+
+function toggleWebhookField() {
+  const collect = document.getElementById('chatbot-collect-leads').checked;
+  document.getElementById('chatbot-webhook-field').style.display = collect ? 'block' : 'none';
+}
+
+async function loadChatbotConfig() {
+  const { data } = await sb.from('chatbot_configs').select('*').eq('user_id', currentUser.id).single();
+  if (data) {
+    chatbotConfigId = data.id;
+    document.getElementById('chatbot-bot-name').value = data.bot_name || '';
+    document.getElementById('chatbot-company-name').value = data.company_name || '';
+    document.getElementById('chatbot-company-desc').value = data.company_description || '';
+    document.getElementById('chatbot-welcome-msg').value = data.welcome_message || 'Hallo! Wie kann ich Ihnen helfen?';
+    document.getElementById('chatbot-collect-leads').checked = !!data.collect_leads;
+    document.getElementById('chatbot-webhook-url').value = data.lead_webhook_url || '';
+  }
+  toggleWebhookField();
+  renderPlatformList();
+}
+
+async function saveChatbotConfig() {
+  const companyName = document.getElementById('chatbot-company-name').value.trim();
+  const companyDesc = document.getElementById('chatbot-company-desc').value.trim();
+  if (!companyName || !companyDesc) { alert('Bitte Firmenname und Beschreibung ausfüllen.'); return; }
+
+  const btn = document.getElementById('chatbot-save-btn');
+  setLoading(btn, true, 'Speichern & Aktivieren');
+
+  const payload = {
+    user_id: currentUser.id,
+    bot_name: document.getElementById('chatbot-bot-name').value.trim() || 'Assistent',
+    company_name: companyName,
+    company_description: companyDesc,
+    welcome_message: document.getElementById('chatbot-welcome-msg').value.trim(),
+    collect_leads: document.getElementById('chatbot-collect-leads').checked,
+    lead_webhook_url: document.getElementById('chatbot-webhook-url').value.trim() || null,
+  };
+
+  if (chatbotConfigId) {
+    await sb.from('chatbot_configs').update(payload).eq('id', chatbotConfigId);
+  } else {
+    const { data } = await sb.from('chatbot_configs').insert(payload).select().single();
+    chatbotConfigId = data?.id;
+  }
+  setLoading(btn, false, 'Speichern & Aktivieren');
+  renderPlatformList();
+  alert('Chatbot-Konfiguration wurde gespeichert.');
+}
+
+function renderPlatformList() {
+  const wrap = document.getElementById('chatbot-platforms');
+  wrap.innerHTML = PLATFORMS.map((p, i) => `
+    <div class="platform-card" onclick="showPlatformDetail(${i})">
+      <div class="platform-icon-box">${p.icon}</div>
+      <div class="platform-name">${p.name}</div>
+      <div class="platform-arrow">›</div>
+    </div>
+  `).join('');
+}
+
+function getEmbedCode() {
+  const welcome = document.getElementById('chatbot-welcome-msg')?.value || 'Hallo! Wie kann ich Ihnen helfen?';
+  if (!chatbotConfigId) return '(Erst Konfiguration speichern)';
+  return `<script>\n  window.OFFICEAI_CONFIG = {\n    config_id: "${chatbotConfigId}",\n    welcome: "${welcome}"\n  };\n<\/script>\n<script src="https://liviavogel.github.io/officeai-widget/widget.js"><\/script>`;
+}
+
+function showPlatformDetail(i) {
+  const p = PLATFORMS[i];
+  document.getElementById('chatbot-platform-list').style.display = 'none';
+  const detail = document.getElementById('chatbot-platform-detail');
+  detail.style.display = 'block';
+  detail.innerHTML = `
+    <button class="back-link" onclick="hidePlatformDetail()">← Alle Plattformen</button>
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+      <div class="platform-icon-box">${p.icon}</div>
+      <div style="font-size:20px; font-weight:700; color:#E8E8E8; letter-spacing:-0.5px;">${p.name}</div>
+    </div>
+    <div class="card-title">Schritte</div>
+    ${p.steps.map((step, idx) => `
+      <div class="step-row">
+        <div class="step-num">${idx + 1}</div>
+        <div class="step-text">${step}</div>
+      </div>
+    `).join('')}
+    <div class="tip-card">${p.tip}</div>
+    <div class="card-title">Dein Code</div>
+    <div class="code-box">${getEmbedCode().replace(/</g, '&lt;')}</div>
+    <div class="service-card" onclick="handleInstallRequest()">
+      <div style="flex:1;">
+        <div style="font-size:14px; font-weight:600; color:#E8E8E8; margin-bottom:3px;">Hilfe bei der Installation?</div>
+        <div style="font-size:11px; color:#3A3A3A; line-height:1.6;">Wir übernehmen das für Sie — ab CHF 49. Antwort innert 24h.</div>
+      </div>
+      <span style="color:#2E2E2E;">›</span>
+    </div>
+  `;
+}
+
+function hidePlatformDetail() {
+  document.getElementById('chatbot-platform-list').style.display = 'block';
+  document.getElementById('chatbot-platform-detail').style.display = 'none';
+}
+
+function handleInstallRequest() {
+  const subject = 'Chatbot%20Installation';
+  const body = 'Hallo%2C%0A%0AIch%20m%C3%B6chte%20den%20Chatbot%20auf%20meiner%20Webseite%20installieren%20lassen.%0A%0AMeine%20Webseite%3A%20%0APlatform%3A%20%0A%0AFreundliche%20Gr%C3%BCsse';
+  window.location.href = `mailto:info@officeai.ch?subject=${subject}&body=${body}`;
+}
+
+async function loadChatbotLeads() {
+  const wrap = document.getElementById('chatbot-leads-list');
+  if (!chatbotConfigId) {
+    wrap.innerHTML = '<p style="font-size:13px; color:#3A3A3A; line-height:1.6;">Noch keine Leads. Sobald jemand den Chatbot nutzt und Kontaktdaten hinterlässt, erscheinen sie hier.</p>';
+    return;
+  }
+  const { data } = await sb.from('chatbot_leads').select('*').eq('config_id', chatbotConfigId).order('created_at', { ascending: false });
+  if (!data || data.length === 0) {
+    wrap.innerHTML = '<p style="font-size:13px; color:#3A3A3A; line-height:1.6;">Noch keine Leads. Sobald jemand den Chatbot nutzt und Kontaktdaten hinterlässt, erscheinen sie hier.</p>';
+    return;
+  }
+  wrap.innerHTML = data.map(lead => `
+    <div class="lead-card">
+      <div class="lead-name">${lead.name || 'Unbekannt'}</div>
+      <div class="lead-info">${lead.email || ''}</div>
+      ${lead.phone ? `<div class="lead-info">${lead.phone}</div>` : ''}
+      ${lead.summary ? `<div class="lead-summary">${lead.summary}</div>` : ''}
+      <div class="lead-date">${new Date(lead.created_at).toLocaleDateString('de-CH')}</div>
+    </div>
+  `).join('');
+}
+
+/* =========================================================
+   CRM
+   ========================================================= */
+
+const STAGES = ['neu', 'kontaktiert', 'angebot', 'verhandlung', 'gewonnen', 'verloren'];
+const STAGE_LABELS = { neu: 'Neu', kontaktiert: 'Kontaktiert', angebot: 'Angebot', verhandlung: 'Verhandlung', gewonnen: 'Gewonnen', verloren: 'Verloren' };
+const STAGE_BG = { neu: '#2A2A2A', kontaktiert: '#1A2A3A', angebot: '#2A2A1A', verhandlung: '#2A1A2A', gewonnen: '#1A2A1A', verloren: '#2A1A1A' };
+const STAGE_FG = { neu: '#505050', kontaktiert: '#4A7A9B', angebot: '#7A7A30', verhandlung: '#7A3A7A', gewonnen: '#3A7A3A', verloren: '#7A3A3A' };
+
+let allContacts = [];
+let crmFilter = 'alle';
+
+async function loadContacts() {
+  const { data } = await sb.from('contacts').select('*, tasks(id, done)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  allContacts = data || [];
+  renderCrmFilters();
+  renderContacts();
+}
+
+function renderCrmFilters() {
+  const wrap = document.getElementById('crm-filters');
+  const opts = ['alle', ...STAGES];
+  wrap.innerHTML = opts.map(f => `
+    <div class="filter-chip ${crmFilter === f ? 'active' : ''}" onclick="setCrmFilter('${f}')">${f === 'alle' ? 'Alle' : STAGE_LABELS[f]}</div>
+  `).join('');
+}
+
+function setCrmFilter(f) {
+  crmFilter = f;
+  renderCrmFilters();
+  renderContacts();
+}
+
+function renderContacts() {
+  const search = (document.getElementById('crm-search')?.value || '').toLowerCase();
+  const wrap = document.getElementById('crm-list');
+  const filtered = allContacts.filter(c => {
+    const matchSearch = (c.name || '').toLowerCase().includes(search) || (c.company || '').toLowerCase().includes(search);
+    const matchFilter = crmFilter === 'alle' || c.pipeline_stage === crmFilter;
+    return matchSearch && matchFilter;
+  });
+
+  if (filtered.length === 0) {
+    wrap.innerHTML = '<p style="font-size:13px; color:#3A3A3A; text-align:center; margin-top:24px; line-height:1.6;">Keine Kontakte. Klicke auf "+ Neu" um einen hinzuzufügen.</p>';
+    return;
+  }
+
+  wrap.innerHTML = filtered.map(c => {
+    const openTasks = (c.tasks || []).filter(t => !t.done).length;
+    const stage = c.pipeline_stage || 'neu';
+    return `
+    <div class="contact-card" onclick='openContactDetail(${JSON.stringify(c.id)})'>
+      <div class="contact-avatar">${(c.name || '?').charAt(0).toUpperCase()}</div>
+      <div class="contact-body">
+        <div class="contact-top">
+          <span class="contact-name">${c.name}</span>
+          <span class="stage-badge" style="background:${STAGE_BG[stage]}; color:${STAGE_FG[stage]};">${STAGE_LABELS[stage]}</span>
+        </div>
+        ${c.company ? `<div class="contact-company">${c.company}</div>` : ''}
+        <div class="contact-bottom">
+          ${c.email ? `<span class="contact-info">${c.email}</span>` : ''}
+          ${openTasks > 0 ? `<span class="task-badge">${openTasks} Aufgabe${openTasks > 1 ? 'n' : ''}</span>` : ''}
+        </div>
+      </div>
+      <div class="contact-arrow">›</div>
+    </div>
+  `;
+  }).join('');
+}
+
+function openAddContactForm() {
+  document.getElementById('crm-form-title').textContent = 'Neuer Kontakt';
+  document.getElementById('crm-contact-id').value = '';
+  document.getElementById('crm-name').value = '';
+  document.getElementById('crm-company').value = '';
+  document.getElementById('crm-email').value = '';
+  document.getElementById('crm-phone').value = '';
+  document.getElementById('crm-stage').value = 'neu';
+  document.getElementById('crm-notes').value = '';
+  document.getElementById('crm-delete-btn').style.display = 'none';
+  document.getElementById('crm-form-card').style.display = 'block';
+}
+
+function openContactDetail(id) {
+  const c = allContacts.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('crm-form-title').textContent = c.name;
+  document.getElementById('crm-contact-id').value = c.id;
+  document.getElementById('crm-name').value = c.name || '';
+  document.getElementById('crm-company').value = c.company || '';
+  document.getElementById('crm-email').value = c.email || '';
+  document.getElementById('crm-phone').value = c.phone || '';
+  document.getElementById('crm-stage').value = c.pipeline_stage || 'neu';
+  document.getElementById('crm-notes').value = c.notes || '';
+  document.getElementById('crm-delete-btn').style.display = 'block';
+  document.getElementById('crm-form-card').style.display = 'block';
+}
+
+function closeContactForm() {
+  document.getElementById('crm-form-card').style.display = 'none';
+}
+
+async function saveContact() {
+  const name = document.getElementById('crm-name').value.trim();
+  if (!name) { alert('Bitte einen Namen eingeben.'); return; }
+
+  const id = document.getElementById('crm-contact-id').value;
+  const payload = {
+    user_id: currentUser.id,
+    name,
+    company: document.getElementById('crm-company').value.trim() || null,
+    email: document.getElementById('crm-email').value.trim() || null,
+    phone: document.getElementById('crm-phone').value.trim() || null,
+    pipeline_stage: document.getElementById('crm-stage').value,
+    notes: document.getElementById('crm-notes').value.trim() || null,
+  };
+
+  if (id) {
+    await sb.from('contacts').update(payload).eq('id', id);
+  } else {
+    await sb.from('contacts').insert(payload);
+  }
+  closeContactForm();
+  loadContacts();
+}
+
+async function deleteContact() {
+  const id = document.getElementById('crm-contact-id').value;
+  if (!id) return;
+  if (!confirm('Diesen Kontakt wirklich löschen?')) return;
+  await sb.from('contacts').delete().eq('id', id);
+  closeContactForm();
+  loadContacts();
+}
+
+/* =========================================================
+   KONKURRENZ-ANALYSE
+   ========================================================= */
+
+let allCompetitors = [];
+
+function setCompetitorTab(i) {
+  for (let n = 0; n < 2; n++) {
+    document.getElementById('competitor-tab-' + n).classList.toggle('active', n === i);
+    document.getElementById('competitor-panel-' + n).classList.toggle('active', n === i);
+  }
+  if (i === 1) loadCompetitorReports();
+}
+
+async function loadCompetitors() {
+  const { data } = await sb.from('competitors').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  allCompetitors = data || [];
+  renderCompetitors();
+}
+
+function renderCompetitors() {
+  const wrap = document.getElementById('competitor-list');
+  if (allCompetitors.length === 0) {
+    wrap.innerHTML = '<p style="font-size:13px; color:#3A3A3A; line-height:1.6;">Noch keine Konkurrenten. Füge den ersten hinzu.</p>';
+    return;
+  }
+  wrap.innerHTML = allCompetitors.map(c => `
+    <div class="competitor-card">
+      <div style="flex:1;">
+        <div class="competitor-name">${c.name}</div>
+        <div class="competitor-url">${c.website_url}</div>
+      </div>
+      <button class="competitor-delete" onclick='deleteCompetitor(${JSON.stringify(c.id)}, ${JSON.stringify(c.name)})'>✕</button>
+    </div>
+  `).join('');
+}
+
+async function addCompetitor() {
+  const name = document.getElementById('competitor-name').value.trim();
+  let url = document.getElementById('competitor-url').value.trim();
+  if (!name || !url) { alert('Bitte Name und Webseite eingeben.'); return; }
+  if (!url.startsWith('http')) url = `https://${url}`;
+
+  await sb.from('competitors').insert({ user_id: currentUser.id, name, website_url: url });
+  document.getElementById('competitor-name').value = '';
+  document.getElementById('competitor-url').value = '';
+  loadCompetitors();
+  alert(`${name} wird ab jetzt beobachtet.`);
+}
+
+async function deleteCompetitor(id, name) {
+  if (!confirm(`${name} wirklich entfernen?`)) return;
+  await sb.from('competitors').delete().eq('id', id);
+  loadCompetitors();
+}
+
+async function runCompetitorAnalysis() {
+  const btn = document.getElementById('competitor-analyze-btn');
+  setLoading(btn, true, '🔍 Analyse jetzt starten');
+  try {
+    await fetch('https://zccpcatyyxmpagqjkfrz.supabase.co/functions/v1/competitor-analysis', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+    });
+    alert('Analyse abgeschlossen. Neue Berichte sind verfügbar.');
+    loadCompetitorReports();
+  } catch (e) {
+    alert('Analyse fehlgeschlagen.');
+  }
+  setLoading(btn, false, '🔍 Analyse jetzt starten');
+}
+
+async function loadCompetitorReports() {
+  const wrap = document.getElementById('competitor-reports-list');
+  const { data } = await sb.from('competitor_reports').select('*').eq('user_id', currentUser.id).order('report_date', { ascending: false });
+  if (!data || data.length === 0) {
+    wrap.innerHTML = '<p style="font-size:13px; color:#3A3A3A; line-height:1.6;">Noch keine Berichte. Starte eine Analyse im Tab "Konkurrenten".</p>';
+    return;
+  }
+  wrap.innerHTML = data.map(r => `
+    <div class="report-card">
+      <div class="report-date">${new Date(r.report_date).toLocaleDateString('de-CH')}</div>
+      <div class="report-text">${r.report_text}</div>
+    </div>
+  `).join('');
 }
 
 init();
