@@ -6,6 +6,7 @@
   <title>Office AI – App</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <style>
@@ -72,6 +73,40 @@
     .logo-preview span { font-size:10px; color:#505050; text-align:center; padding:4px; }
     .logo-upload-actions { display:flex; gap:8px; }
     .logo-upload-actions input[type="file"] { display:none; }
+    input[type="range"] { padding:0; background:transparent; border:none; accent-color:#E8E8E8; }
+    #doc-download-error { display:none; color:#e05252; font-size:12px; margin-top:8px; }
+
+    /* POSITIONS-EDITOR */
+    .doc-item-row-input { display:grid; grid-template-columns:2fr 90px 130px 32px; gap:8px; margin-bottom:8px; align-items:center; }
+    .item-remove { background:#1E1E1E; color:#505050; border:none; border-radius:8px; padding:12px; cursor:pointer; font-size:12px; }
+    .item-remove:hover { color:#E8E8E8; }
+    .add-item-btn { background:none; border:1px dashed #2A2A2A; color:#505050; border-radius:10px; padding:10px 16px; font-size:12px; cursor:pointer; width:100%; margin-bottom:16px; }
+    .add-item-btn:hover { color:#E8E8E8; border-color:#505050; }
+
+    /* DOKUMENT-VORSCHAU (professionelles Papier-Layout) */
+    #doc-output { background:transparent; border:none; padding:0; white-space:normal; }
+    #doc-output.visible { display:block; }
+    .doc-paper { background:#fff; color:#1a1a1a; padding:40px; border-radius:6px; }
+    .doc-header { display:flex; justify-content:space-between; align-items:flex-start; gap:24px; margin-bottom:32px; }
+    .doc-logo-img { display:block; }
+    .doc-sender-block { text-align:right; font-size:12px; color:#444; line-height:1.6; }
+    .doc-firma-name { font-weight:700; font-size:14px; color:#111; margin-bottom:2px; }
+    .doc-meta-block { display:flex; justify-content:space-between; margin-bottom:28px; font-size:13px; }
+    .doc-kunde-block { line-height:1.6; color:#222; }
+    .doc-kunde-name { font-weight:700; color:#111; }
+    .doc-doc-meta { text-align:right; color:#555; }
+    .doc-title { font-size:22px; font-weight:800; letter-spacing:1px; margin-bottom:16px; color:#111; }
+    .doc-intro { font-size:13px; line-height:1.7; color:#222; margin-bottom:24px; }
+    .doc-items-table { width:100%; border-collapse:collapse; margin-bottom:20px; font-size:13px; }
+    .doc-items-table th { text-align:left; border-bottom:2px solid #111; padding:8px 6px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#555; }
+    .doc-items-table td { border-bottom:1px solid #e0e0e0; padding:8px 6px; }
+    .doc-cell-qty, .doc-cell-price, .doc-cell-total, .doc-items-table th:nth-child(2), .doc-items-table th:nth-child(3), .doc-items-table th:nth-child(4) { text-align:right; white-space:nowrap; }
+    .doc-totals { margin-left:auto; width:260px; font-size:13px; margin-bottom:24px; }
+    .doc-totals-row { display:flex; justify-content:space-between; padding:4px 0; color:#333; }
+    .doc-totals-final { border-top:2px solid #111; margin-top:6px; padding-top:8px; font-weight:800; font-size:15px; color:#111; }
+    .doc-extra { font-size:12px; color:#555; margin-bottom:20px; border-left:3px solid #ddd; padding-left:10px; }
+    .doc-footer { font-size:12px; color:#555; border-top:1px solid #e0e0e0; padding-top:16px; line-height:1.7; }
+    .doc-signoff { margin-top:12px; }
 
     /* UPGRADE BANNER */
     .upgrade-banner { background:#111; border:1px solid #2A2A2A; border-radius:12px; padding:24px; text-align:center; }
@@ -267,6 +302,10 @@
           </div>
         </div>
       </div>
+      <div class="field">
+        <label>Logo-Grösse im Dokument: <span id="logo-size-label">90px</span></label>
+        <input type="range" id="logo-size" min="40" max="220" value="90" oninput="updateLogoSize(this.value)"/>
+      </div>
       <div class="row">
         <div class="field">
           <label>Dokumenttyp</label>
@@ -292,23 +331,52 @@
           <input type="text" id="doc-company" placeholder="Mustermann GmbH"/>
         </div>
         <div class="field">
-          <label>Kunde</label>
-          <input type="text" id="doc-client" placeholder="Kunde AG"/>
+          <label>Ihre Adresse</label>
+          <input type="text" id="doc-company-address" placeholder="Bahnhofstrasse 1, 6000 Luzern"/>
         </div>
-      </div>
-      <div class="field">
-        <label>Leistung / Produkt</label>
-        <textarea id="doc-service" placeholder="Beschreiben Sie die Leistung oder das Produkt..."></textarea>
       </div>
       <div class="row">
         <div class="field">
-          <label>Betrag (CHF)</label>
-          <input type="number" id="doc-amount" placeholder="1500"/>
+          <label>Telefon (optional)</label>
+          <input type="text" id="doc-phone" placeholder="+41 41 123 45 67"/>
         </div>
+        <div class="field">
+          <label>E-Mail (optional)</label>
+          <input type="text" id="doc-email" placeholder="info@firma.ch"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Kunde</label>
+          <input type="text" id="doc-client" placeholder="Kunde AG"/>
+        </div>
+        <div class="field">
+          <label>Kundenadresse</label>
+          <input type="text" id="doc-client-address" placeholder="Musterstrasse 5, 8000 Zürich"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Positionen</label>
+        <div id="doc-items"></div>
+        <button type="button" class="add-item-btn" onclick="addDocItemRow()">+ Position hinzufügen</button>
+      </div>
+      <div class="row">
         <div class="field">
           <label>MwSt (%)</label>
           <input type="number" id="doc-vat" placeholder="8.1" value="8.1"/>
         </div>
+        <div class="field">
+          <label>Rabatt (%)</label>
+          <input type="number" id="doc-discount" placeholder="0" value="0"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Zahlungsfrist (Tage)</label>
+        <input type="number" id="doc-due" placeholder="30" value="30"/>
+      </div>
+      <div class="field">
+        <label>Bemerkungen (optional)</label>
+        <textarea id="doc-extra" placeholder="Zusätzliche Hinweise..."></textarea>
       </div>
       <button class="btn" onclick="generateDocument()">Dokument generieren</button>
       <div class="output" id="doc-output" contenteditable="true"></div>
@@ -323,6 +391,7 @@
           <button class="btn btn-secondary" onclick="downloadDocument('word')">Als Word</button>
           <button class="btn btn-secondary" onclick="downloadDocument('excel')">Als Excel</button>
         </div>
+        <div id="doc-download-error"></div>
       </div>
     </div>
   </div>
@@ -818,35 +887,199 @@ function setLoading(btnEl, loading, label) {
   btnEl.innerHTML = loading ? '<span class="spinner"></span>Wird generiert...' : label;
 }
 
+// ---- POSITIONEN ----
+let docItemIdCounter = 0;
+
+function addDocItemRow(values = {}) {
+  const container = document.getElementById('doc-items');
+  const id = `item-${docItemIdCounter++}`;
+  const row = document.createElement('div');
+  row.className = 'doc-item-row-input';
+  row.dataset.itemId = id;
+  row.innerHTML = `
+    <input type="text" class="item-desc" placeholder="Beschreibung"/>
+    <input type="number" class="item-qty" placeholder="Menge" min="0" step="0.01" value="1"/>
+    <input type="number" class="item-price" placeholder="Preis/Einheit" min="0" step="0.01"/>
+    <button type="button" class="item-remove" onclick="removeDocItemRow('${id}')">✕</button>
+  `;
+  container.appendChild(row);
+  if (values.desc) row.querySelector('.item-desc').value = values.desc;
+  if (values.qty != null) row.querySelector('.item-qty').value = values.qty;
+  if (values.price != null) row.querySelector('.item-price').value = values.price;
+}
+
+function removeDocItemRow(id) {
+  const row = document.querySelector(`.doc-item-row-input[data-item-id="${id}"]`);
+  if (row) row.remove();
+}
+
+function collectDocItems() {
+  return Array.from(document.querySelectorAll('.doc-item-row-input')).map((row) => {
+    const desc = row.querySelector('.item-desc').value.trim();
+    const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+    return { desc, qty, price, total: qty * price };
+  }).filter((i) => i.desc || i.total);
+}
+
+function calcDocTotals(items, vatPct, discountPct) {
+  const subtotal = items.reduce((s, i) => s + i.total, 0);
+  const discountAmt = subtotal * (discountPct / 100);
+  const afterDiscount = subtotal - discountAmt;
+  const vatAmt = afterDiscount * (vatPct / 100);
+  const total = afterDiscount + vatAmt;
+  return { subtotal, discountAmt, afterDiscount, vatAmt, total };
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+function cleanAiSignature(text) {
+  return (text || '')
+    .split('\n')
+    .filter((line) => !/office\s*ai/i.test(line) && !/(erstellt|generiert|powered)\s+(mit|by|durch)/i.test(line))
+    .join('\n')
+    .trim();
+}
+
+const DOC_TITLES = {
+  offerte:  { de: 'OFFERTE',  en: 'QUOTATION', fr: 'OFFRE',    it: 'OFFERTA' },
+  rechnung: { de: 'RECHNUNG', en: 'INVOICE',   fr: 'FACTURE',  it: 'FATTURA' },
+  mahnung:  { de: 'MAHNUNG',  en: 'REMINDER',  fr: 'RAPPEL',   it: 'SOLLECITO' },
+};
+
+function generateDocNumber(rawType) {
+  const prefix = { offerte: 'OF', rechnung: 'RE', mahnung: 'MA' }[rawType] || 'DOC';
+  const d = new Date();
+  return `${prefix}-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 900 + 100)}`;
+}
+
+function renderDocumentPreview(model) {
+  const el = document.getElementById('doc-output');
+  const title = (DOC_TITLES[model.rawType] && DOC_TITLES[model.rawType][model.lang]) || model.rawType.toUpperCase();
+  const logoHtml = currentLogoBase64 ? `<img src="${currentLogoBase64}" class="doc-logo-img" style="max-width:${currentLogoSizePx}px; max-height:${currentLogoSizePx}px; object-fit:contain;"/>` : '';
+
+  const itemsHtml = model.items.map((i) => `
+    <tr class="doc-item-preview-row">
+      <td class="doc-cell-desc">${escapeHtml(i.desc)}</td>
+      <td class="doc-cell-qty">${i.qty}</td>
+      <td class="doc-cell-price">CHF ${i.price.toFixed(2)}</td>
+      <td class="doc-cell-total">CHF ${i.total.toFixed(2)}</td>
+    </tr>`).join('');
+
+  el.innerHTML = `
+    <div class="doc-paper">
+      <div class="doc-header">
+        <div class="doc-logo-block">${logoHtml}</div>
+        <div class="doc-sender-block">
+          <div class="doc-firma-name">${escapeHtml(model.firma)}</div>
+          <div class="doc-firma-address">${escapeHtml(model.firmaAdresse).replace(/\n/g, '<br/>')}</div>
+          <div class="doc-firma-contact">${[model.telefon, model.email].filter(Boolean).map(escapeHtml).join(' · ')}</div>
+        </div>
+      </div>
+      <div class="doc-meta-block">
+        <div class="doc-kunde-block">
+          <div class="doc-kunde-name">${escapeHtml(model.kunde)}</div>
+          <div class="doc-kunde-address">${escapeHtml(model.kundeAdresse).replace(/\n/g, '<br/>')}</div>
+        </div>
+        <div class="doc-doc-meta">
+          <div>Dok.-Nr.: ${model.docNumber}</div>
+          <div>Datum: ${model.date}</div>
+        </div>
+      </div>
+      <div class="doc-title">${title}</div>
+      <div class="doc-intro">${escapeHtml(model.introText).replace(/\n/g, '<br/>')}</div>
+      <table class="doc-items-table">
+        <thead><tr><th>Beschreibung</th><th>Menge</th><th>Preis/Einheit</th><th>Total</th></tr></thead>
+        <tbody>${itemsHtml}</tbody>
+      </table>
+      <div class="doc-totals">
+        <div class="doc-totals-row"><span>Zwischentotal</span><span>CHF ${model.totals.subtotal.toFixed(2)}</span></div>
+        ${model.rabatt ? `<div class="doc-totals-row"><span>Rabatt (${model.rabatt}%)</span><span>- CHF ${model.totals.discountAmt.toFixed(2)}</span></div>` : ''}
+        <div class="doc-totals-row"><span>MwSt (${model.vat}%)</span><span>CHF ${model.totals.vatAmt.toFixed(2)}</span></div>
+        <div class="doc-totals-row doc-totals-final"><span>Total</span><span>CHF ${model.totals.total.toFixed(2)}</span></div>
+      </div>
+      ${model.extra ? `<div class="doc-extra">${escapeHtml(model.extra).replace(/\n/g, '<br/>')}</div>` : ''}
+      <div class="doc-footer">
+        <div>Zahlbar innert ${model.zahlungsfrist} Tagen.</div>
+        <div class="doc-signoff">Freundliche Grüsse<br/>${escapeHtml(model.firma)}</div>
+      </div>
+    </div>`;
+}
+
 async function generateDocument() {
   const btn = event.target;
   setLoading(btn, true, 'Dokument generieren');
   const typeMap = { offerte: 'offer', rechnung: 'invoice', mahnung: 'reminder' };
   const rawType = document.getElementById('doc-type').value;
+  const lang = document.getElementById('doc-lang').value;
+  const firma = document.getElementById('doc-company').value;
+  const firmaAdresse = document.getElementById('doc-company-address').value;
+  const telefon = document.getElementById('doc-phone').value;
+  const email = document.getElementById('doc-email').value;
+  const kunde = document.getElementById('doc-client').value;
+  const kundeAdresse = document.getElementById('doc-client-address').value;
+  const vat = parseFloat(document.getElementById('doc-vat').value) || 0;
+  const rabatt = parseFloat(document.getElementById('doc-discount').value) || 0;
+  const zahlungsfrist = document.getElementById('doc-due').value || '30';
+  const extra = document.getElementById('doc-extra').value;
+
+  const items = collectDocItems();
+  const totals = calcDocTotals(items, vat, rabatt);
+  const leistung = items.map((i) => `${i.desc} (${i.qty} x CHF ${i.price.toFixed(2)})`).join('; ');
+
   const data = await callEdgeFunction('generate-document', {
     mode: typeMap[rawType] || rawType,
-    language: document.getElementById('doc-lang').value,
-    firma: document.getElementById('doc-company').value,
-    kunde: document.getElementById('doc-client').value,
-    leistung: document.getElementById('doc-service').value,
-    betrag: document.getElementById('doc-amount').value,
+    language: lang,
+    firma, kunde, leistung,
+    betrag: totals.total.toFixed(2),
     versandart: 'email',
-    firmaAdresse: '', kundeAdresse: '',
-    telefon: '', email: '', website: '',
-    zahlungsfrist: '30', rabatt: '0', extra: '',
+    firmaAdresse, kundeAdresse,
+    telefon, email, website: '',
+    zahlungsfrist, rabatt: String(rabatt), extra,
     logo: currentLogoBase64 || null,
   });
-  setOutput('doc-output', data.text || data.error || 'Fehler');
-  if (!data.error) {
-    document.getElementById('doc-filename').value = `${rawType}-${(document.getElementById('doc-client').value || 'dokument').toLowerCase().replace(/\s+/g, '-')}`;
-    document.getElementById('doc-download-area').style.display = 'block';
+
+  if (data.error) {
+    setOutput('doc-output', data.error);
+    setLoading(btn, false, 'Dokument generieren');
+    return;
   }
+
+  const model = {
+    rawType, lang, firma, firmaAdresse, telefon, email,
+    kunde, kundeAdresse, items, totals, vat, rabatt, zahlungsfrist, extra,
+    introText: cleanAiSignature(data.text),
+    docNumber: generateDocNumber(rawType),
+    date: new Date().toLocaleDateString('de-CH'),
+  };
+
+  renderDocumentPreview(model);
+  document.getElementById('doc-output').classList.add('visible');
+  document.getElementById('doc-actions').style.display = 'flex';
+  document.getElementById('doc-filename').value = `${rawType}-${(kunde || 'dokument').toLowerCase().replace(/\s+/g, '-')}`;
+  document.getElementById('doc-download-area').style.display = 'block';
+  document.getElementById('doc-download-error').style.display = 'none';
   setLoading(btn, false, 'Dokument generieren');
 }
 
 // ---- LOGO UPLOAD ----
 let currentLogoBase64 = null;
 let currentLogoMime = null;
+let currentLogoSizePx = 90;
+
+function updateLogoSize(px) {
+  currentLogoSizePx = parseInt(px, 10);
+  document.getElementById('logo-size-label').textContent = `${currentLogoSizePx}px`;
+  const img = document.querySelector('#doc-output .doc-logo-img');
+  if (img) {
+    img.style.maxWidth = `${currentLogoSizePx}px`;
+    img.style.maxHeight = `${currentLogoSizePx}px`;
+  }
+}
 
 function renderLogoPreview(dataUrl) {
   const preview = document.getElementById('logo-preview');
@@ -888,6 +1121,7 @@ async function handleLogoUpload(input) {
     reader.readAsDataURL(file);
   });
   renderLogoPreview(currentLogoBase64);
+  updateLogoSize(currentLogoSizePx);
 
   const ext = file.name.split('.').pop();
   const path = `${currentUser.id}/logo.${ext}`;
@@ -921,59 +1155,212 @@ function base64ToUint8Array(dataUrl) {
   return bytes;
 }
 
+function readDocFromDOM() {
+  const root = document.getElementById('doc-output').querySelector('.doc-paper');
+  if (!root) return null;
+  const get = (sel) => root.querySelector(sel)?.innerText.trim() || '';
+  const items = Array.from(root.querySelectorAll('.doc-item-preview-row')).map((row) => ({
+    desc: row.querySelector('.doc-cell-desc')?.innerText.trim() || '',
+    qty: row.querySelector('.doc-cell-qty')?.innerText.trim() || '',
+    price: row.querySelector('.doc-cell-price')?.innerText.trim() || '',
+    total: row.querySelector('.doc-cell-total')?.innerText.trim() || '',
+  }));
+  const totalsRows = Array.from(root.querySelectorAll('.doc-totals-row')).map((r) => {
+    const spans = r.querySelectorAll('span');
+    return { label: spans[0]?.innerText.trim() || '', value: spans[1]?.innerText.trim() || '', final: r.classList.contains('doc-totals-final') };
+  });
+  return {
+    title: get('.doc-title'),
+    firmaName: get('.doc-firma-name'),
+    firmaAddress: get('.doc-firma-address'),
+    firmaContact: get('.doc-firma-contact'),
+    kundeName: get('.doc-kunde-name'),
+    kundeAddress: get('.doc-kunde-address'),
+    docMeta: get('.doc-doc-meta'),
+    intro: get('.doc-intro'),
+    items,
+    totalsRows,
+    extra: get('.doc-extra'),
+    footer: get('.doc-footer'),
+  };
+}
+
+function showDownloadError(message) {
+  const el = document.getElementById('doc-download-error');
+  el.textContent = message;
+  el.style.display = message ? 'block' : 'none';
+}
+
 async function downloadDocument(format) {
-  const text = document.getElementById('doc-output').innerText.trim();
-  if (!text) return;
+  const doc = readDocFromDOM();
+  if (!doc) { showDownloadError('Bitte zuerst ein Dokument generieren.'); return; }
+  showDownloadError('');
   const filenameInput = document.getElementById('doc-filename').value.trim();
   const filename = (filenameInput || 'dokument').replace(/[^a-z0-9\-_äöüÄÖÜ ]/gi, '').trim() || 'dokument';
-  const lines = text.split('\n');
+  const logoSizeMm = currentLogoSizePx * 0.2646;
 
-  if (format === 'pdf') {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    let y = 20;
-    if (currentLogoBase64) {
-      const imgFormat = currentLogoMime?.includes('png') ? 'PNG' : 'JPEG';
-      try { doc.addImage(currentLogoBase64, imgFormat, 15, 10, 40, 40); y = 60; } catch (e) { console.error(e); }
-    }
-    doc.setFontSize(11);
-    lines.forEach((line) => {
-      const wrapped = doc.splitTextToSize(line || ' ', 180);
-      wrapped.forEach((w) => {
-        if (y > 280) { doc.addPage(); y = 20; }
-        doc.text(w, 15, y);
+  try {
+    if (format === 'pdf') {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      let y = 15;
+      if (currentLogoBase64) {
+        const imgFormat = currentLogoMime?.includes('png') ? 'PNG' : 'JPEG';
+        pdf.addImage(currentLogoBase64, imgFormat, 15, y, logoSizeMm, logoSizeMm);
+      }
+      pdf.setFontSize(16); pdf.setFont(undefined, 'bold');
+      pdf.text(doc.firmaName, 195, y + 5, { align: 'right' });
+      pdf.setFontSize(9); pdf.setFont(undefined, 'normal');
+      pdf.text(pdf.splitTextToSize(doc.firmaAddress, 90), 195, y + 12, { align: 'right' });
+      if (doc.firmaContact) pdf.text(doc.firmaContact, 195, y + 24, { align: 'right' });
+
+      y = Math.max(y + logoSizeMm + 10, 55);
+      pdf.setFontSize(11); pdf.setFont(undefined, 'bold');
+      pdf.text(doc.kundeName, 15, y);
+      pdf.setFont(undefined, 'normal');
+      pdf.text(pdf.splitTextToSize(doc.kundeAddress, 90), 15, y + 6);
+      pdf.text(doc.docMeta, 195, y, { align: 'right' });
+
+      y += 22;
+      pdf.setFontSize(20); pdf.setFont(undefined, 'bold');
+      pdf.text(doc.title, 15, y);
+
+      y += 10;
+      pdf.setFontSize(10); pdf.setFont(undefined, 'normal');
+      const introLines = pdf.splitTextToSize(doc.intro, 180);
+      pdf.text(introLines, 15, y);
+      y += introLines.length * 5 + 6;
+
+      pdf.autoTable({
+        startY: y,
+        head: [['Beschreibung', 'Menge', 'Preis/Einheit', 'Total']],
+        body: doc.items.map((i) => [i.desc, i.qty, i.price, i.total]),
+        theme: 'plain',
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fontStyle: 'bold', lineWidth: { bottom: 0.5 }, lineColor: [0, 0, 0] },
+        columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } },
+      });
+      y = pdf.lastAutoTable.finalY + 10;
+
+      doc.totalsRows.forEach((row) => {
+        if (row.final) { pdf.setFont(undefined, 'bold'); pdf.setFontSize(11); } else { pdf.setFont(undefined, 'normal'); pdf.setFontSize(10); }
+        pdf.text(row.label, 145, y);
+        pdf.text(row.value, 195, y, { align: 'right' });
         y += 6;
       });
-    });
-    doc.save(`${filename}.pdf`);
-  }
 
-  if (format === 'word') {
-    const { Document, Packer, Paragraph, ImageRun } = window.docx;
-    const children = [];
-    if (currentLogoBase64) {
-      children.push(new Paragraph({ children: [new ImageRun({ data: base64ToUint8Array(currentLogoBase64), transformation: { width: 120, height: 120 } })] }));
-    }
-    lines.forEach((line) => children.push(new Paragraph({ text: line })));
-    const doc = new Document({ sections: [{ children }] });
-    const blob = await Packer.toBlob(doc);
-    triggerDownload(blob, `${filename}.docx`);
-  }
+      if (doc.extra) {
+        y += 6; pdf.setFontSize(9); pdf.setFont(undefined, 'italic');
+        pdf.text(pdf.splitTextToSize(doc.extra, 180), 15, y);
+        y += pdf.splitTextToSize(doc.extra, 180).length * 5;
+      }
 
-  if (format === 'excel') {
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Dokument');
-    let startRow = 1;
-    if (currentLogoBase64) {
-      const ext = currentLogoMime?.includes('png') ? 'png' : 'jpeg';
-      const imageId = workbook.addImage({ base64: currentLogoBase64, extension: ext });
-      sheet.addImage(imageId, { tl: { col: 0, row: 0 }, ext: { width: 120, height: 120 } });
-      startRow = 8;
+      y += 10; pdf.setFontSize(9); pdf.setFont(undefined, 'normal');
+      pdf.text(pdf.splitTextToSize(doc.footer, 180), 15, y);
+
+      pdf.save(`${filename}.pdf`);
     }
-    sheet.getColumn(1).width = 100;
-    lines.forEach((line, i) => { sheet.getCell(startRow + i, 1).value = line; });
-    const buffer = await workbook.xlsx.writeBuffer();
-    triggerDownload(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${filename}.xlsx`);
+
+    if (format === 'word') {
+      const { Document, Packer, Paragraph, ImageRun, Table, TableRow, TableCell, TextRun, HeadingLevel, AlignmentType, WidthType } = window.docx;
+      const children = [];
+      if (currentLogoBase64) {
+        const pxSize = Math.round(currentLogoSizePx);
+        children.push(new Paragraph({ children: [new ImageRun({ data: base64ToUint8Array(currentLogoBase64), transformation: { width: pxSize, height: pxSize } })] }));
+      }
+      children.push(new Paragraph({ children: [new TextRun({ text: doc.firmaName, bold: true })] }));
+      if (doc.firmaAddress) children.push(new Paragraph({ text: doc.firmaAddress }));
+      if (doc.firmaContact) children.push(new Paragraph({ text: doc.firmaContact }));
+      children.push(new Paragraph({ text: '' }));
+      children.push(new Paragraph({ children: [new TextRun({ text: doc.kundeName, bold: true })] }));
+      if (doc.kundeAddress) children.push(new Paragraph({ text: doc.kundeAddress }));
+      children.push(new Paragraph({ text: doc.docMeta }));
+      children.push(new Paragraph({ text: '' }));
+      children.push(new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun({ text: doc.title, bold: true })] }));
+      children.push(new Paragraph({ text: doc.intro }));
+      children.push(new Paragraph({ text: '' }));
+
+      const headerRow = new TableRow({
+        children: ['Beschreibung', 'Menge', 'Preis/Einheit', 'Total'].map((h) => new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: h, bold: true })] })] })),
+      });
+      const itemRows = doc.items.map((i) => new TableRow({
+        children: [i.desc, i.qty, i.price, i.total].map((v) => new TableCell({ children: [new Paragraph({ text: String(v) })] })),
+      }));
+      children.push(new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [headerRow, ...itemRows] }));
+      children.push(new Paragraph({ text: '' }));
+
+      doc.totalsRows.forEach((row) => {
+        children.push(new Paragraph({
+          alignment: AlignmentType.RIGHT,
+          children: [new TextRun({ text: `${row.label}: ${row.value}`, bold: row.final })],
+        }));
+      });
+
+      if (doc.extra) { children.push(new Paragraph({ text: '' })); children.push(new Paragraph({ text: doc.extra, italics: true })); }
+      children.push(new Paragraph({ text: '' }));
+      children.push(new Paragraph({ text: doc.footer }));
+
+      const wordDoc = new Document({ sections: [{ children }] });
+      const blob = await Packer.toBlob(wordDoc);
+      triggerDownload(blob, `${filename}.docx`);
+    }
+
+    if (format === 'excel') {
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet('Dokument');
+      let row = 1;
+      if (currentLogoBase64) {
+        const ext = currentLogoMime?.includes('png') ? 'png' : 'jpeg';
+        const imageId = workbook.addImage({ base64: currentLogoBase64, extension: ext });
+        sheet.addImage(imageId, { tl: { col: 0, row: 0 }, ext: { width: currentLogoSizePx, height: currentLogoSizePx } });
+        row = Math.ceil(currentLogoSizePx / 20) + 2;
+      }
+      sheet.getCell(row, 1).value = doc.firmaName; sheet.getCell(row, 1).font = { bold: true }; row++;
+      if (doc.firmaAddress) { sheet.getCell(row, 1).value = doc.firmaAddress; row++; }
+      if (doc.firmaContact) { sheet.getCell(row, 1).value = doc.firmaContact; row++; }
+      row++;
+      sheet.getCell(row, 1).value = doc.kundeName; sheet.getCell(row, 1).font = { bold: true }; row++;
+      if (doc.kundeAddress) { sheet.getCell(row, 1).value = doc.kundeAddress; row++; }
+      sheet.getCell(row, 1).value = doc.docMeta; row += 2;
+      sheet.getCell(row, 1).value = doc.title; sheet.getCell(row, 1).font = { bold: true, size: 16 }; row += 2;
+      if (doc.intro) { sheet.getCell(row, 1).value = doc.intro; row += 2; }
+
+      const headerRow = row;
+      ['Beschreibung', 'Menge', 'Preis/Einheit', 'Total'].forEach((h, i) => {
+        const cell = sheet.getCell(headerRow, i + 1);
+        cell.value = h; cell.font = { bold: true };
+      });
+      row++;
+      doc.items.forEach((i) => {
+        sheet.getCell(row, 1).value = i.desc;
+        sheet.getCell(row, 2).value = i.qty;
+        sheet.getCell(row, 3).value = i.price;
+        sheet.getCell(row, 4).value = i.total;
+        row++;
+      });
+      row++;
+      doc.totalsRows.forEach((r) => {
+        sheet.getCell(row, 3).value = r.label;
+        const cell = sheet.getCell(row, 4);
+        cell.value = r.value;
+        if (r.final) { sheet.getCell(row, 3).font = { bold: true }; cell.font = { bold: true }; }
+        row++;
+      });
+      if (doc.extra) { row++; sheet.getCell(row, 1).value = doc.extra; row++; }
+      row++;
+      sheet.getCell(row, 1).value = doc.footer;
+
+      sheet.getColumn(1).width = 45;
+      sheet.getColumn(2).width = 12;
+      sheet.getColumn(3).width = 18;
+      sheet.getColumn(4).width = 18;
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      triggerDownload(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${filename}.xlsx`);
+    }
+  } catch (e) {
+    console.error(`Download fehlgeschlagen (${format})`, e);
+    showDownloadError(`Fehler beim Erstellen der Datei: ${e.message}`);
   }
 }
 
@@ -987,6 +1374,8 @@ function triggerDownload(blob, filename) {
   a.remove();
   URL.revokeObjectURL(url);
 }
+
+addDocItemRow();
 
 async function generateEmail() {
   const btn = event.target;
