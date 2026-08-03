@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Office AI – App</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:-apple-system,'Helvetica Neue',Arial,sans-serif; background:#0C0C0C; color:#E8E8E8; min-height:100vh; }
@@ -56,9 +59,19 @@
     /* OUTPUT */
     .output { background:#0C0C0C; border:1px solid #1E1E1E; border-radius:10px; padding:20px; margin-top:16px; font-size:14px; color:#505050; line-height:1.8; white-space:pre-wrap; min-height:120px; display:none; }
     .output.visible { display:block; }
-    .output-actions { display:flex; gap:8px; margin-top:12px; }
+    .output-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
     .copy-btn { background:#1E1E1E; color:#505050; border:none; border-radius:8px; padding:8px 16px; font-size:12px; font-weight:600; cursor:pointer; }
     .copy-btn:hover { color:#E8E8E8; }
+    .output[contenteditable="true"] { cursor:text; }
+    .output[contenteditable="true"]:focus { outline:1px solid #505050; }
+
+    /* LOGO UPLOAD */
+    .logo-upload { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+    .logo-preview { width:64px; height:64px; border-radius:8px; border:1px solid #1E1E1E; background:#0C0C0C; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+    .logo-preview img { width:100%; height:100%; object-fit:contain; }
+    .logo-preview span { font-size:10px; color:#505050; text-align:center; padding:4px; }
+    .logo-upload-actions { display:flex; gap:8px; }
+    .logo-upload-actions input[type="file"] { display:none; }
 
     /* UPGRADE BANNER */
     .upgrade-banner { background:#111; border:1px solid #2A2A2A; border-radius:12px; padding:24px; text-align:center; }
@@ -243,6 +256,17 @@
     <div class="page-title">Geschäftsdokumente</div>
     <div class="page-subtitle">Offerten, Rechnungen und Mahnungen in Sekunden.</div>
     <div class="card">
+      <div class="field">
+        <label>Firmenlogo</label>
+        <div class="logo-upload">
+          <div class="logo-preview" id="logo-preview"><span>Kein Logo</span></div>
+          <div class="logo-upload-actions">
+            <label class="copy-btn" for="doc-logo-input">Logo hochladen</label>
+            <input type="file" id="doc-logo-input" accept="image/png,image/jpeg,image/svg+xml" onchange="handleLogoUpload(this)"/>
+            <button class="copy-btn" id="logo-remove-btn" onclick="removeLogo()" style="display:none">Entfernen</button>
+          </div>
+        </div>
+      </div>
       <div class="row">
         <div class="field">
           <label>Dokumenttyp</label>
@@ -287,9 +311,18 @@
         </div>
       </div>
       <button class="btn" onclick="generateDocument()">Dokument generieren</button>
-      <div class="output" id="doc-output"></div>
+      <div class="output" id="doc-output" contenteditable="true"></div>
       <div class="output-actions" id="doc-actions" style="display:none">
         <button class="copy-btn" onclick="copyOutput('doc-output')">Kopieren</button>
+      </div>
+      <div class="field" id="doc-download-area" style="display:none; margin-top:16px;">
+        <label>Dateiname</label>
+        <input type="text" id="doc-filename" placeholder="offerte-mustermann"/>
+        <div class="output-actions">
+          <button class="btn" onclick="downloadDocument('pdf')">Als PDF</button>
+          <button class="btn btn-secondary" onclick="downloadDocument('word')">Als Word</button>
+          <button class="btn btn-secondary" onclick="downloadDocument('excel')">Als Excel</button>
+        </div>
       </div>
     </div>
   </div>
@@ -703,6 +736,7 @@ async function init() {
 
   const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
   currentProfile = profile;
+  loadUserLogo();
 
   const plan = profile?.plan || 'starter';
   const allowed = PLAN_FEATURES[plan] || PLAN_FEATURES.starter;
@@ -800,9 +834,158 @@ async function generateDocument() {
     firmaAdresse: '', kundeAdresse: '',
     telefon: '', email: '', website: '',
     zahlungsfrist: '30', rabatt: '0', extra: '',
+    logo: currentLogoBase64 || null,
   });
   setOutput('doc-output', data.text || data.error || 'Fehler');
+  if (!data.error) {
+    document.getElementById('doc-filename').value = `${rawType}-${(document.getElementById('doc-client').value || 'dokument').toLowerCase().replace(/\s+/g, '-')}`;
+    document.getElementById('doc-download-area').style.display = 'block';
+  }
   setLoading(btn, false, 'Dokument generieren');
+}
+
+// ---- LOGO UPLOAD ----
+let currentLogoBase64 = null;
+let currentLogoMime = null;
+
+function renderLogoPreview(dataUrl) {
+  const preview = document.getElementById('logo-preview');
+  const removeBtn = document.getElementById('logo-remove-btn');
+  if (dataUrl) {
+    preview.innerHTML = `<img src="${dataUrl}" alt="Logo"/>`;
+    removeBtn.style.display = 'inline-block';
+  } else {
+    preview.innerHTML = `<span>Kein Logo</span>`;
+    removeBtn.style.display = 'none';
+  }
+}
+
+async function loadUserLogo() {
+  if (!currentProfile?.logo_url) return;
+  try {
+    const res = await fetch(currentProfile.logo_url);
+    const blob = await res.blob();
+    currentLogoMime = blob.type || 'image/png';
+    currentLogoBase64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+    renderLogoPreview(currentLogoBase64);
+  } catch (e) {
+    console.error('Logo konnte nicht geladen werden', e);
+  }
+}
+
+async function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  currentLogoMime = file.type;
+  currentLogoBase64 = await new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+  renderLogoPreview(currentLogoBase64);
+
+  const ext = file.name.split('.').pop();
+  const path = `${currentUser.id}/logo.${ext}`;
+  const { error: uploadError } = await sb.storage.from('logos').upload(path, file, { upsert: true, contentType: file.type });
+  if (uploadError) {
+    console.error('Logo-Upload fehlgeschlagen', uploadError);
+    return;
+  }
+  const { data: { publicUrl } } = sb.storage.from('logos').getPublicUrl(path);
+  const { error: updateError } = await sb.from('profiles').update({ logo_url: publicUrl }).eq('id', currentUser.id);
+  if (!updateError) {
+    currentProfile.logo_url = publicUrl;
+  }
+}
+
+async function removeLogo() {
+  currentLogoBase64 = null;
+  currentLogoMime = null;
+  renderLogoPreview(null);
+  document.getElementById('doc-logo-input').value = '';
+  await sb.from('profiles').update({ logo_url: null }).eq('id', currentUser.id);
+  if (currentProfile) currentProfile.logo_url = null;
+}
+
+// ---- DOKUMENT DOWNLOAD ----
+function base64ToUint8Array(dataUrl) {
+  const base64 = dataUrl.split(',')[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+async function downloadDocument(format) {
+  const text = document.getElementById('doc-output').innerText.trim();
+  if (!text) return;
+  const filenameInput = document.getElementById('doc-filename').value.trim();
+  const filename = (filenameInput || 'dokument').replace(/[^a-z0-9\-_äöüÄÖÜ ]/gi, '').trim() || 'dokument';
+  const lines = text.split('\n');
+
+  if (format === 'pdf') {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 20;
+    if (currentLogoBase64) {
+      const imgFormat = currentLogoMime?.includes('png') ? 'PNG' : 'JPEG';
+      try { doc.addImage(currentLogoBase64, imgFormat, 15, 10, 40, 40); y = 60; } catch (e) { console.error(e); }
+    }
+    doc.setFontSize(11);
+    lines.forEach((line) => {
+      const wrapped = doc.splitTextToSize(line || ' ', 180);
+      wrapped.forEach((w) => {
+        if (y > 280) { doc.addPage(); y = 20; }
+        doc.text(w, 15, y);
+        y += 6;
+      });
+    });
+    doc.save(`${filename}.pdf`);
+  }
+
+  if (format === 'word') {
+    const { Document, Packer, Paragraph, ImageRun } = window.docx;
+    const children = [];
+    if (currentLogoBase64) {
+      children.push(new Paragraph({ children: [new ImageRun({ data: base64ToUint8Array(currentLogoBase64), transformation: { width: 120, height: 120 } })] }));
+    }
+    lines.forEach((line) => children.push(new Paragraph({ text: line })));
+    const doc = new Document({ sections: [{ children }] });
+    const blob = await Packer.toBlob(doc);
+    triggerDownload(blob, `${filename}.docx`);
+  }
+
+  if (format === 'excel') {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Dokument');
+    let startRow = 1;
+    if (currentLogoBase64) {
+      const ext = currentLogoMime?.includes('png') ? 'png' : 'jpeg';
+      const imageId = workbook.addImage({ base64: currentLogoBase64, extension: ext });
+      sheet.addImage(imageId, { tl: { col: 0, row: 0 }, ext: { width: 120, height: 120 } });
+      startRow = 8;
+    }
+    sheet.getColumn(1).width = 100;
+    lines.forEach((line, i) => { sheet.getCell(startRow + i, 1).value = line; });
+    const buffer = await workbook.xlsx.writeBuffer();
+    triggerDownload(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${filename}.xlsx`);
+  }
+}
+
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 async function generateEmail() {
