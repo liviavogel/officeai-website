@@ -787,16 +787,21 @@ function setLoading(btnEl, loading, label) {
 async function generateDocument() {
   const btn = event.target;
   setLoading(btn, true, 'Dokument generieren');
+  const typeMap = { offerte: 'offer', rechnung: 'invoice', mahnung: 'reminder' };
+  const rawType = document.getElementById('doc-type').value;
   const data = await callEdgeFunction('generate-document', {
-    type: document.getElementById('doc-type').value,
+    mode: typeMap[rawType] || rawType,
     language: document.getElementById('doc-lang').value,
-    company: document.getElementById('doc-company').value,
-    client: document.getElementById('doc-client').value,
-    service: document.getElementById('doc-service').value,
-    amount: document.getElementById('doc-amount').value,
-    vat: document.getElementById('doc-vat').value,
+    firma: document.getElementById('doc-company').value,
+    kunde: document.getElementById('doc-client').value,
+    leistung: document.getElementById('doc-service').value,
+    betrag: document.getElementById('doc-amount').value,
+    versandart: 'email',
+    firmaAdresse: '', kundeAdresse: '',
+    telefon: '', email: '', website: '',
+    zahlungsfrist: '30', rabatt: '0', extra: '',
   });
-  setOutput('doc-output', data.document || data.error || 'Fehler');
+  setOutput('doc-output', data.text || data.error || 'Fehler');
   setLoading(btn, false, 'Dokument generieren');
 }
 
